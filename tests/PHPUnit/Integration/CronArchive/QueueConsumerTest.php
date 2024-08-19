@@ -10,7 +10,6 @@
 namespace Piwik\Tests\Integration\CronArchive;
 
 use Piwik\ArchiveProcessor\Rules;
-use Piwik\CliMulti\RequestParser;
 use Piwik\Common;
 use Piwik\Config;
 use Piwik\Period\Day;
@@ -68,7 +67,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             $cronArchive,
-            new RequestParser(true),
             $archiveFilter
         );
 
@@ -167,13 +165,12 @@ class QueueConsumerTest extends IntegrationTestCase
 
         $queueConsumer = new QueueConsumer(
             StaticContainer::get(LoggerInterface::class),
-            new FixedSiteIds([1,2,3]),
+            new FixedSiteIds([1, 2, 3]),
             3,
             24,
             new Model(),
             new SegmentArchiving(),
             $cronArchive,
-            new RequestParser(true),
             $archiveFilter
         );
 
@@ -355,13 +352,12 @@ class QueueConsumerTest extends IntegrationTestCase
 
         $queueConsumer = new QueueConsumer(
             StaticContainer::get(LoggerInterface::class),
-            new FixedSiteIds([1,2,3]),
+            new FixedSiteIds([1, 2, 3]),
             3,
             24,
             new Model(),
             new SegmentArchiving(),
             $cronArchive,
-            new RequestParser(true),
             $archiveFilter
         );
 
@@ -483,7 +479,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             $cronArchive,
-            new RequestParser(true),
             $archiveFilter
         );
 
@@ -564,7 +559,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             $cronArchive,
-            new RequestParser(true),
             $archiveFilter
         );
 
@@ -690,7 +684,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             $cronArchive,
-            new RequestParser(true),
             $archiveFilter
         );
 
@@ -742,7 +735,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             $cronArchive,
-            new RequestParser(true),
             $archiveFilter
         );
         $this->assertNull($queueConsumer->setMaxSitesToProcess());
@@ -885,7 +877,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             $cronArchive,
-            new RequestParser(true),
             $archiveFilter
         );
 
@@ -914,7 +905,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             new CronArchive(),
-            new RequestParser(true),
             $this->makeTestArchiveFilter()
         );
 
@@ -943,7 +933,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             new CronArchive(),
-            new RequestParser(true),
             $this->makeTestArchiveFilter()
         );
 
@@ -979,7 +968,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             new CronArchive(),
-            new RequestParser(true),
             $this->makeTestArchiveFilter()
         );
 
@@ -1018,7 +1006,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             new CronArchive(),
-            new RequestParser(true),
             $this->makeTestArchiveFilter()
         );
 
@@ -1054,7 +1041,6 @@ class QueueConsumerTest extends IntegrationTestCase
             new Model(),
             new SegmentArchiving(),
             new CronArchive(),
-            new RequestParser(true),
             $this->makeTestArchiveFilter()
         );
 
@@ -1178,10 +1164,9 @@ class QueueConsumerTest extends IntegrationTestCase
         Rules::setBrowserTriggerArchiving(true);
 
         $this->insertInvalidations($existingInvalidations);
-        $cliRequestProcessor = $this->getMockRequestParser([]);
 
         /** @var QueueConsumer $queueConsumer */
-        $queueConsumer = $this->getQueueConsumerWithMocks($cliRequestProcessor);
+        $queueConsumer = $this->getQueueConsumerWithMocks();
 
         $periods = array_flip(Piwik::$idPeriods);
 
@@ -1457,23 +1442,13 @@ class QueueConsumerTest extends IntegrationTestCase
                      ->getMock();
     }
 
-    private function getMockRequestParser($cliMultiProcesses)
-    {
-        $mock = $this->getMockBuilder(RequestParser::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getInProgressArchivingCommands'])
-            ->getMock();
-        $mock->method('getInProgressArchivingCommands')->willReturn($cliMultiProcesses);
-        return $mock;
-    }
-
-    private function getQueueConsumerWithMocks($cliRequestProcessor)
+    private function getQueueConsumerWithMocks()
     {
         $mockCronArchive = $this->getMockBuilder(CronArchive::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        return new QueueConsumer(new NullLogger(), null, null, null, new Model(), new SegmentArchiving(), $mockCronArchive, $cliRequestProcessor);
+        return new QueueConsumer(new NullLogger(), null, null, null, new Model(), new SegmentArchiving(), $mockCronArchive);
     }
 
     protected static function configureFixture($fixture)
