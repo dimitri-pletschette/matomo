@@ -34,17 +34,17 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         Fixture::createWebsite('2012-01-01 00:00:00');
     }
 
-    private function trackPageview(\MatomoTracker $tracker, $url, string $userId = null)
+    private function trackPageview(\MatomoTracker $tracker, $url, $userId = null)
     {
-        if ($userId) {
+        if (null !== $userId) {
             $tracker->setUserId($userId);
         }
         return $tracker->doTrackPageView($url);
     }
 
-    private function trackAction(\MatomoTracker $tracker, $action, string $userId = null)
+    private function trackAction(\MatomoTracker $tracker, $action, $userId = null)
     {
-        if ($userId) {
+        if (null !== $userId) {
             $tracker->setUserId($userId);
         }
         return $tracker->doTrackAction($action, 'link');
@@ -162,6 +162,74 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         Fixture::checkResponse($response);
         $this->assertVisitCount(1);
         $this->assertActionCount(6);
+        $this->assertVisitorIdsCount(1);
+    }
+
+    // user logs in during a visit, custom User ID is only provided for the log in action
+    // user id replaces visitor id and there is still only one distinct value, but is different
+    public function testUserLogsInAndOutDuringVisit()
+    {
+        $tracker = $this->getTracker();
+
+        $response = $this->trackPageview($tracker,'page-1');
+        Fixture::checkResponse($response);
+        $this->assertVisitCount(1);
+        $this->assertActionCount(1);
+        $this->assertVisitorIdsCount(1);
+
+        $response = $this->trackPageview($tracker,'page-2');
+        Fixture::checkResponse($response);
+        $this->assertVisitCount(1);
+        $this->assertActionCount(2);
+        $this->assertVisitorIdsCount(1);
+
+        $response = $this->trackAction($tracker, 'action-1');
+        Fixture::checkResponse($response);
+        $this->assertVisitCount(1);
+        $this->assertActionCount(3);
+        $this->assertVisitorIdsCount(1);
+
+        $visitorId1 = $this->getVisitProperty('idvisitor', 1);
+
+        // track second action with user id
+        $response = $this->trackAction($tracker, 'log-in', 'user 1');
+        Fixture::checkResponse($response);
+        $this->assertVisitCount(1);
+        $this->assertActionCount(4);
+        $this->assertVisitorIdsCount(1);
+
+        // expect changed visitor id
+        $visitorId2 = $this->getVisitProperty('idvisitor', 1);
+        $this->assertNotEquals($visitorId1, $visitorId2);
+
+        $response = $this->trackAction($tracker, 'action-2');
+        Fixture::checkResponse($response);
+        $this->assertVisitCount(1);
+        $this->assertActionCount(5);
+        $this->assertVisitorIdsCount(1);
+
+        $response = $this->trackPageview($tracker, 'page-3');
+        Fixture::checkResponse($response);
+        $this->assertVisitCount(1);
+        $this->assertActionCount(6);
+        $this->assertVisitorIdsCount(1);
+
+        // log out and de-set user id
+        $response = $this->trackAction($tracker, 'log-out', false);
+        Fixture::checkResponse($response);
+        $this->assertVisitCount(1);
+        $this->assertActionCount(7);
+        $this->assertVisitorIdsCount(1);
+
+        // expect original visitor id after logging out
+        $visitorId3 = $this->getVisitProperty('idvisitor', 1);
+        $this->assertEquals($visitorId1, $visitorId3);
+        $this->assertNotEquals($visitorId2, $visitorId3);
+
+        $response = $this->trackAction($tracker, 'action-3');
+        Fixture::checkResponse($response);
+        $this->assertVisitCount(1);
+        $this->assertActionCount(8);
         $this->assertVisitorIdsCount(1);
     }
 
