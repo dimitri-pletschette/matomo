@@ -13,7 +13,6 @@ use Piwik\Common;
 use Piwik\Config;
 use Piwik\Date;
 use Piwik\Db;
-use Piwik\Plugins\Goals\API as GoalsAPI;
 use Piwik\Tests\Framework\Fixture;
 use Piwik\Tests\Framework\TestCase\IntegrationTestCase;
 
@@ -29,7 +28,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     public const CHANGED_COUNTRY = 'jp';
     public const CHANGED_REGION = '22';
 
-    private int $trackerEventTsIterator;
+    private $trackerEventTsIterator;
 
     public function setUp(): void
     {
@@ -93,10 +92,10 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     {
         $tracker = $this->getTracker();
 
-        $this->trackPageview($tracker,'page-1');
+        $this->trackPageview($tracker, 'page-1');
         $this->assertCounts(1, 1, 1);
 
-        $this->trackPageview($tracker,'page-2');
+        $this->trackPageview($tracker, 'page-2');
         $this->assertCounts(1, 2, 1);
 
         $this->trackAction($tracker, 'action-1');
@@ -116,10 +115,10 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     {
         $tracker = $this->getTracker();
 
-        $this->trackPageview($tracker,'page-1');
+        $this->trackPageview($tracker, 'page-1');
         $this->assertCounts(1, 1, 1);
 
-        $this->trackPageview($tracker,'page-2');
+        $this->trackPageview($tracker, 'page-2');
         $this->assertCounts(1, 2, 1);
 
         $this->trackAction($tracker, 'action-1');
@@ -148,10 +147,10 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     {
         $tracker = $this->getTracker();
 
-        $this->trackPageview($tracker,'page-1');
+        $this->trackPageview($tracker, 'page-1');
         $this->assertCounts(1, 1, 1);
 
-        $this->trackPageview($tracker,'page-2');
+        $this->trackPageview($tracker, 'page-2');
         $this->assertCounts(1, 2, 1);
 
         $this->trackAction($tracker, 'action-1');
@@ -190,16 +189,16 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     {
         $trackerDevice1 = $this->getTracker();
 
-        $this->trackPageview($trackerDevice1,'page-1');
-        $this->trackPageview($trackerDevice1,'page-2');
+        $this->trackPageview($trackerDevice1, 'page-1');
+        $this->trackPageview($trackerDevice1, 'page-2');
         $this->trackAction($trackerDevice1, 'action-1');
         $this->trackAction($trackerDevice1, 'log-in', 'user 1');
         $this->assertCounts(1, 4, 1);
 
         $trackerDevice2 = $this->getTrackerForAlternateDevice();
 
-        $this->trackPageview($trackerDevice2,'page-3');
-        $this->trackPageview($trackerDevice2,'page-4');
+        $this->trackPageview($trackerDevice2, 'page-3');
+        $this->trackPageview($trackerDevice2, 'page-4');
         $this->trackAction($trackerDevice2, 'action-2');
         $this->trackAction($trackerDevice2, 'log-in', 'user 1');
 
@@ -214,8 +213,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     {
         $tracker = $this->getTracker();
 
-        $this->trackPageview($tracker,'page-1');
-        $this->trackPageview($tracker,'page-2');
+        $this->trackPageview($tracker, 'page-1');
+        $this->trackPageview($tracker, 'page-2');
         $this->trackAction($tracker, 'action-1');
         $this->trackAction($tracker, 'log-in', 'user 1');
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
@@ -265,8 +264,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     {
         $tracker = $this->getTracker();
 
-        $this->trackPageview($tracker,'page-1');
-        $this->trackPageview($tracker,'page-2');
+        $this->trackPageview($tracker, 'page-1');
+        $this->trackPageview($tracker, 'page-2');
         $this->trackAction($tracker, 'action-1');
         $this->trackAction($tracker, 'log-in', 'user 1');
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
@@ -274,8 +273,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         // move time beyond default visit length
         $this->trackerEventTsIterator += Config::getInstance()->Tracker['visit_standard_length'] + 1;
 
-        $this->trackPageview($tracker,'page-3');
-        $this->trackPageview($tracker,'page-4');
+        $this->trackPageview($tracker, 'page-3');
+        $this->trackPageview($tracker, 'page-4');
         $this->trackAction($tracker, 'action-5');
         $visitorId2 = $this->getVisitProperty('idvisitor', 2);
 
@@ -285,7 +284,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         // move time beyond default visit length
         $this->trackerEventTsIterator += Config::getInstance()->Tracker['visit_standard_length'] + 1;
 
-        $this->trackPageview($tracker,'page-5');
+        $this->trackPageview($tracker, 'page-5');
 
         $this->assertCounts(3, 8, 1, 1, 1);
     }
@@ -294,13 +293,13 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     {
         $tracker = $this->getTracker();
 
-        $this->trackPageview($tracker,'page-1');
+        $this->trackPageview($tracker, 'page-1');
         $this->trackAction($tracker, 'action-1');
 
         // move time by a day
         $this->trackerEventTsIterator += 24 * 60 * 60;
 
-        $this->trackPageview($tracker,'page-3');
+        $this->trackPageview($tracker, 'page-3');
         $this->trackAction($tracker, 'action-3');
 
         $this->assertCounts(2, 4, 1);
@@ -324,7 +323,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         ];
         $tracker->setAttributionInfo(json_encode($attribution));
 
-        $this->trackPageview($tracker,'page-1');
+        $this->trackPageview($tracker, 'page-1');
 
         // new tracker instance
         $tracker = $this->getTracker();
@@ -342,7 +341,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         ];
         $tracker->setAttributionInfo(json_encode($attribution));
 
-        $this->trackPageview($tracker,'page-2');
+        $this->trackPageview($tracker, 'page-2');
 
         $this->assertCounts(2, 2, 1); // TODO - find out why this fails to create 2nd visit
     }
