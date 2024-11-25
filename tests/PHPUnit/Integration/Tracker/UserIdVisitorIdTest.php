@@ -39,24 +39,28 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackerEventTsIterator = Date::factory(self::FIRST_VISIT_TIME)->getTimestamp();
     }
 
-    private function trackPageview(\MatomoTracker $tracker, $url, $userId = null)
+    private function trackPageview(\MatomoTracker $tracker, $url)
     {
-        if (null !== $userId) {
-            $tracker->setUserId($userId);
-        }
         $tracker->setForceVisitDateTime($this->trackerEventTsIterator++);
         $response = $tracker->doTrackPageView($url);
         Fixture::checkResponse($response);
     }
 
-    private function trackAction(\MatomoTracker $tracker, $action, $userId = null)
+    private function trackAction(\MatomoTracker $tracker, $action)
     {
-        if (null !== $userId) {
-            $tracker->setUserId($userId);
-        }
         $tracker->setForceVisitDateTime($this->trackerEventTsIterator++);
         $response = $tracker->doTrackAction($action, 'link');
         Fixture::checkResponse($response);
+    }
+
+    private function logInUser(\MatomoTracker $tracker)
+    {
+        $tracker->setUserId('user-1');
+    }
+
+    private function logOutUser(\MatomoTracker $tracker)
+    {
+        $tracker->setUserId(false);
     }
 
     private function getTracker()
@@ -127,7 +131,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
         // track second action with user id
-        $this->trackAction($tracker, 'log-in', 'user 1');
+        $this->logInUser($tracker);
+        $this->trackAction($tracker, 'log-in');
         $this->assertCounts(1, 4, 1);
 
         // expect changed visitor id
@@ -159,7 +164,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
         // track second action with user id
-        $this->trackAction($tracker, 'log-in', 'user 1');
+        $this->logInUser($tracker);
+        $this->trackAction($tracker, 'log-in');
         $this->assertCounts(1, 4, 1);
 
         // expect changed visitor id
@@ -173,7 +179,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->assertCounts(1, 6, 1);
 
         // log out and de-set user id
-        $this->trackAction($tracker, 'log-out', false);
+        $this->logOutUser($tracker);
+        $this->trackAction($tracker, 'log-out');
         $this->assertCounts(1, 7, 1);
 
         // expect original visitor id after logging out
@@ -192,7 +199,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackPageview($trackerDevice1, 'page-1');
         $this->trackPageview($trackerDevice1, 'page-2');
         $this->trackAction($trackerDevice1, 'action-1');
-        $this->trackAction($trackerDevice1, 'log-in', 'user 1');
+        $this->logInUser($trackerDevice1);
+        $this->trackAction($trackerDevice1, 'log-in');
         $this->assertCounts(1, 4, 1);
 
         $trackerDevice2 = $this->getTrackerForAlternateDevice();
@@ -200,7 +208,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackPageview($trackerDevice2, 'page-3');
         $this->trackPageview($trackerDevice2, 'page-4');
         $this->trackAction($trackerDevice2, 'action-2');
-        $this->trackAction($trackerDevice2, 'log-in', 'user 1');
+        $this->logInUser($trackerDevice2);
+        $this->trackAction($trackerDevice2, 'log-in');
 
         $this->assertCounts(2, 8, 2);
         $this->assertVisitorIdsCount(2); // TODO - discuss with product that new device forms a new visit
@@ -216,7 +225,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackPageview($tracker, 'page-1');
         $this->trackPageview($tracker, 'page-2');
         $this->trackAction($tracker, 'action-1');
-        $this->trackAction($tracker, 'log-in', 'user 1');
+        $this->logInUser($tracker);
+        $this->trackAction($tracker, 'log-in');
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
         $this->assertCounts(1, 4, 1);
@@ -226,7 +236,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
         $this->assertCounts(1, 6, 1);
 
-        $this->trackAction($tracker, 'log-out', false);
+        $this->logOutUser($tracker);
+        $this->trackAction($tracker, 'log-out');
         $visitorId2 = $this->getVisitProperty('idvisitor', 1);
 
         $this->assertCounts(1, 7, 1, 1);
@@ -237,7 +248,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
         $this->trackAction($tracker, 'action-3');
         $this->trackPageview($tracker, 'page-4');
-        $this->trackAction($tracker, 'log-in', 'user 1');
+        $this->logInUser($tracker);
+        $this->trackAction($tracker, 'log-in');
         $visitorId3 = $this->getVisitProperty('idvisitor', 2);
 
         $this->assertCounts(2, 10, 2);
@@ -247,7 +259,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
         $this->assertCounts(2, 12, 2);
 
-        $this->trackAction($tracker, 'log-out', false);
+        $this->logOutUser($tracker);
+        $this->trackAction($tracker, 'log-out');
         $visitorId4 = $this->getVisitProperty('idvisitor', 2);
         $this->assertCounts(2, 13, 2);
 
@@ -267,7 +280,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackPageview($tracker, 'page-1');
         $this->trackPageview($tracker, 'page-2');
         $this->trackAction($tracker, 'action-1');
-        $this->trackAction($tracker, 'log-in', 'user 1');
+        $this->logInUser($tracker);
+        $this->trackAction($tracker, 'log-in');
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
         // move time beyond default visit length
