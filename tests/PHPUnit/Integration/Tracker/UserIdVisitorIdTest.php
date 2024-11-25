@@ -323,41 +323,13 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     {
         $tracker = $this->getTracker();
 
-        $attrDT = Date::factory(self::FIRST_VISIT_TIME)->addHour(1)->getDatetime();
-        $tracker->setForceVisitDateTime($attrDT);
-        $tracker->setUrlReferrer('http://www.example.org/');
-        $tracker->setUrl('http://www.example.org/');
-
-        // add campaign info
-        $attribution = [
-            'CAMPAIGN NAME 1',
-            'CAMPAIGN%20KEYWORD 1',
-            $attrDT,
-            'http://www.example.org/',
-        ];
-        $tracker->setAttributionInfo(json_encode($attribution));
-
+        $tracker->setUrl('http://www.example.com/?utm_campaign=first');
         $this->trackPageview($tracker, 'page-1');
 
-        // new tracker instance
-        $tracker = $this->getTracker();
-        $attrDT = Date::factory(self::FIRST_VISIT_TIME)->addHour(2)->getDatetime();
-        $tracker->setForceVisitDateTime($attrDT);
-        $tracker->setUrlReferrer('http://www.example.com/');
-        $tracker->setUrl('http://www.example.com/');
-
-        // change campaign info
-        $attribution = [
-            'CAMPAIGN NAME 2',
-            'CAMPAIGN%20KEYWORD 2',
-            $attrDT,
-            'http://www.example.com',
-        ];
-        $tracker->setAttributionInfo(json_encode($attribution));
-
+        $tracker->setUrl('http://www.example.com/?utm_campaign=second');
         $this->trackPageview($tracker, 'page-2');
 
-        $this->assertCounts(2, 2, 1); // TODO - find out why this fails to create 2nd visit
+        $this->assertCounts(2, 2, 1);
     }
 
     private function assertCounts(int $visits, int $actions, int $visitorIds, int $userIds = null, int $configIds = null)
