@@ -146,6 +146,31 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->assertCounts(1, 6, 1);
     }
 
+    public function testUserLogsInDuringVisitWithoutActions()
+    {
+        $tracker = $this->getTracker();
+
+        $this->trackPageview($tracker, 'page-1');
+        $this->assertCounts(1, 1, 1);
+
+        $this->trackPageview($tracker, 'page-2');
+        $this->assertCounts(1, 2, 1);
+
+        $visitorId1 = $this->getVisitProperty('idvisitor', 1);
+
+        // track second action with user id
+        $this->logInUser($tracker);
+        $this->trackPageview($tracker, 'page-3');
+        $this->assertCounts(1, 3, 1);
+
+        // expect changed visitor id
+        $visitorId2 = $this->getVisitProperty('idvisitor', 1);
+        $this->assertNotEquals($visitorId1, $visitorId2);
+
+        $this->trackPageview($tracker, 'page-3');
+        $this->assertCounts(1, 4, 1);
+    }
+
     // user logs in during a visit, custom User ID is only provided for the log in action
     // user id replaces visitor id and there is still only one distinct value, but is different
     public function testUserLogsInAndOutDuringVisit()
@@ -192,6 +217,44 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->assertCounts(1, 8, 1);
     }
 
+    public function testUserLogsInAndOutDuringVisitWithoutActions()
+    {
+        $tracker = $this->getTracker();
+
+        $this->trackPageview($tracker, 'page-1');
+        $this->assertCounts(1, 1, 1);
+
+        $this->trackPageview($tracker, 'page-2');
+        $this->assertCounts(1, 2, 1);
+
+        $visitorId1 = $this->getVisitProperty('idvisitor', 1);
+
+        // track second action with user id
+        $this->logInUser($tracker);
+        $this->trackPageview($tracker, 'page-3');
+        $this->assertCounts(1, 3, 1);
+
+        // expect changed visitor id
+        $visitorId2 = $this->getVisitProperty('idvisitor', 1);
+        $this->assertNotEquals($visitorId1, $visitorId2);
+
+        $this->trackPageview($tracker, 'page-4');
+        $this->assertCounts(1, 4, 1);
+
+        // log out and de-set user id
+        $this->logOutUser($tracker);
+        $this->trackPageview($tracker, 'page-5');
+        $this->assertCounts(1, 5, 1);
+
+        // expect original visitor id after logging out
+        $visitorId3 = $this->getVisitProperty('idvisitor', 1);
+        $this->assertEquals($visitorId1, $visitorId3);
+        $this->assertNotEquals($visitorId2, $visitorId3);
+
+        $this->trackPageview($tracker, 'page-6');
+        $this->assertCounts(1, 6, 1);
+    }
+
     public function testUserLoggedInOnMultipleDevices()
     {
         $trackerDevice1 = $this->getTracker();
@@ -212,6 +275,30 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackAction($trackerDevice2, 'log-in');
 
         $this->assertCounts(2, 8, 2);
+        $this->assertVisitorIdsCount(2); // TODO - discuss with product that new device forms a new visit
+
+        // multiple devices, multiple config IDs
+        $this->assertConfigIdsCount(2);
+    }
+
+    public function testUserLoggedInOnMultipleDevicesWithoutActions()
+    {
+        $trackerDevice1 = $this->getTracker();
+
+        $this->trackPageview($trackerDevice1, 'page-1');
+        $this->trackPageview($trackerDevice1, 'page-2');
+        $this->logInUser($trackerDevice1);
+        $this->trackPageview($trackerDevice1, 'page-3');
+        $this->assertCounts(1, 3, 1);
+
+        $trackerDevice2 = $this->getTrackerForAlternateDevice();
+
+        $this->trackPageview($trackerDevice2, 'page-4');
+        $this->trackPageview($trackerDevice2, 'page-5');
+        $this->logInUser($trackerDevice2);
+        $this->trackPageview($trackerDevice2, 'page-6');
+
+        $this->assertCounts(2, 6, 2);
         $this->assertVisitorIdsCount(2); // TODO - discuss with product that new device forms a new visit
 
         // multiple devices, multiple config IDs
@@ -265,6 +352,54 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->assertCounts(2, 13, 2);
 
         // TODO: check when there's no action after the log out action, the idvisitor is empty
+
+        $this->assertEquals($visitorId1, $visitorId3);
+        // since we forced a new visit, the visitor id after second log out is different
+        $this->assertNotEquals($visitorId2, $visitorId4);
+
+        $this->assertUserIdsCount(1);
+    }
+
+    public function testUserLogsInAndOutMultipleTimesWithoutActions()
+    {
+        $tracker = $this->getTracker();
+
+        $this->trackPageview($tracker, 'page-1');
+        $this->trackPageview($tracker, 'page-2');
+        $this->logInUser($tracker);
+        $this->trackPageview($tracker, 'page-3');
+        $visitorId1 = $this->getVisitProperty('idvisitor', 1);
+
+        $this->assertCounts(1, 3, 1);
+
+        $this->trackPageview($tracker, 'page-4');
+
+        $this->assertCounts(1, 4, 1);
+
+        $this->logOutUser($tracker);
+        $this->trackPageview($tracker, 'page-5');
+        $visitorId2 = $this->getVisitProperty('idvisitor', 1);
+
+        $this->assertCounts(1, 5, 1, 1);
+
+        // force new visit and log in
+        $tracker = $this->getTracker();
+        $tracker->setForceNewVisit();
+
+        $this->trackPageview($tracker, 'page-6');
+        $this->logInUser($tracker);
+        $this->trackPageview($tracker, 'page-7');
+        $visitorId3 = $this->getVisitProperty('idvisitor', 2);
+
+        $this->assertCounts(2, 7, 2);
+
+        $this->trackPageview($tracker, 'page-5');
+        $this->assertCounts(2, 8, 2);
+
+        $this->logOutUser($tracker);
+        $this->trackPageview($tracker, 'page-6');
+        $visitorId4 = $this->getVisitProperty('idvisitor', 2);
+        $this->assertCounts(2, 9, 2);
 
         $this->assertEquals($visitorId1, $visitorId3);
         // since we forced a new visit, the visitor id after second log out is different
