@@ -160,8 +160,8 @@ class EvolutionMetric extends ProcessedMetric
 
         if ($row->getMetadata('previousRange') === false || $row->getMetadata('periodName') === false) {
             $period = $this->pastData->getMetadata(DataTableFactory::TABLE_METADATA_PERIOD_INDEX);
-            $row->setMetadata('previousRange', $period->getLocalizedShortString());
             $row->setMetadata('periodName', $period->getLabel());
+            $row->setMetadata('previousRange', $period->getLocalizedShortString());
         }
 
         $pastValue = ($pastValue * $row->getMetadata('ratio'));
