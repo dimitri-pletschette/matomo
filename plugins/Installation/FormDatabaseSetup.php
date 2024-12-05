@@ -173,36 +173,9 @@ class FormDatabaseSetup extends QuickForm2
             'enable_ssl'    => false
         );
 
-        if (strpos($dbInfos['host'], '[') !== false && strpos($dbInfos['host'], ']') !== false) {
-            // host contains opening and closing square brackets
-
-            preg_match_all('/\[(.*?)\]/', $dbInfos['host'], $matches);
-            $internal = $matches[1];
-            // filter_var requires valid IPv6 addresses to not be encased in brackets
-            if (count($internal) > 0 && filter_var($internal[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-                // contents between the square brackets are a valid IPv6 address
-
-                $components = explode("]", $dbInfos['host']);
-                if (count($components) > 1) {
-                    // there is content after the closing square bracket 
-                    preg_match('/^(:\d+)$/', $components[1], $portMatches);
-                    if (count($portMatches) > 0) {
-                        // content after is valid format for a port number
-                        $dbInfos['port'] = substr($portMatches[1], 1);
-                    }
-                }
-                // db connector requires IPv6 to be encased in square brackets
-                $dbInfos['host'] = "[" . $internal[0] . "]";
-            }
-        } else if (($portIndex = strpos($dbInfos['host'], '/')) !== false) {
-            // unix_socket=/path/sock.n
-            $dbInfos['port'] = substr($dbInfos['host'], $portIndex);
-            $dbInfos['host'] = '';
-        } else if (($portIndex = strpos($dbInfos['host'], ':')) !== false) {
-            // host:port
-            $dbInfos['port'] = substr($dbInfos['host'], $portIndex + 1);
-            $dbInfos['host'] = substr($dbInfos['host'], 0, $portIndex);
-        }
+        $extractedHostAndPort = self::extractHostAndPort($dbInfos['host']);
+        $dbInfos['host'] = $extractedHostAndPort['host'];
+        $dbInfos['port'] = $extractedHostAndPort['port'];
 
         try {
             @Db::createDatabaseObject($dbInfos);
@@ -224,6 +197,55 @@ class FormDatabaseSetup extends QuickForm2
         }
 
         return $dbInfos;
+    }
+
+    /**
+     * Extracts the correctly formatted host and port values from the user-provided
+     * database server host.
+     *
+     * @param string $dbHost The user provided host to extract values from
+     * @return array{host: string, port: string} Extracted Host and Port
+     */ 
+    private function extractHostAndPort($dbHost) {
+        
+        $host = "";
+        $port = "";
+
+        if (strpos($dbHost, '[') !== false && strpos($dbHost, ']') !== false) {
+            // host contains opening and closing square brackets
+
+            preg_match_all('/\[(.*?)\]/', $dbHost, $matches);
+            $internal = $matches[1];
+            // filter_var requires valid IPv6 addresses to not be encased in brackets
+            if (count($internal) > 0 && filter_var($internal[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
+                // contents between the square brackets are a valid IPv6 address
+
+                $components = explode("]", $dbHost);
+                if (count($components) > 1) {
+                    // there is content after the closing square bracket 
+                    preg_match('/^(:\d+)$/', $components[1], $portMatches);
+                    if (count($portMatches) > 0) {
+                        // content after is valid format for a port number
+                        $port = substr($portMatches[1], 1);
+                    }
+                }
+                // db connector requires IPv6 to be encased in square brackets
+                $host = "[" . $internal[0] . "]";
+            }
+        } else if (($portIndex = strpos($dbHost, '/')) !== false) {
+            // unix_socket=/path/sock.n
+            $port = substr($dbHost, $portIndex);
+            $host = '';
+        } else if (($portIndex = strpos($dbHost, ':')) !== false) {
+            // host:port
+            $port = substr($dbHost, $portIndex + 1);
+            $host = substr($dbHost, 0, $portIndex);
+        }
+
+        return [
+            'host' => $host, 
+            'port' => $port
+        ];
     }
 }
 
