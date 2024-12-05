@@ -97,20 +97,21 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
-        $this->assertCounts(1, 1, 1);
+        $this->assertCounts([1], 1);
 
         $this->trackPageview($tracker, 'page-2');
-        $this->assertCounts(1, 2, 1);
+        $this->assertCounts([2], 1);
 
         $this->trackAction($tracker, 'action-1');
-        $this->assertCounts(1, 3, 1);
+        $this->assertCounts([3], 1);
 
+        // force a new visit for the same visitor
         $tracker->setForceNewVisit();
         $this->trackPageview($tracker, 'page-3');
-        $this->assertCounts(2, 4, 1);
+        $this->assertCounts([3, 1], 1);
 
         $this->trackAction($tracker, 'action-2');
-        $this->assertCounts(2, 5, 1);
+        $this->assertCounts([3, 2], 1);
     }
 
     // user logs in during a visit, custom User ID is only provided for the log in action
@@ -120,30 +121,30 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
-        $this->assertCounts(1, 1, 1);
+        $this->assertCounts([1], 1);
 
         $this->trackPageview($tracker, 'page-2');
-        $this->assertCounts(1, 2, 1);
+        $this->assertCounts([2], 1);
 
         $this->trackAction($tracker, 'action-1');
-        $this->assertCounts(1, 3, 1);
+        $this->assertCounts([3], 1);
 
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
         // track second action with user id
         $this->logInUser($tracker);
         $this->trackAction($tracker, 'log-in');
-        $this->assertCounts(1, 4, 1);
+        $this->assertCounts([4], 1);
 
         // expect changed visitor id
         $visitorId2 = $this->getVisitProperty('idvisitor', 1);
         $this->assertNotEquals($visitorId1, $visitorId2);
 
         $this->trackAction($tracker, 'action-2');
-        $this->assertCounts(1, 5, 1);
+        $this->assertCounts([5], 1);
 
         $this->trackPageview($tracker, 'page-3');
-        $this->assertCounts(1, 6, 1);
+        $this->assertCounts([6], 1);
     }
 
     public function testUserLogsInDuringVisitWithoutActions()
@@ -151,24 +152,24 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
-        $this->assertCounts(1, 1, 1);
+        $this->assertCounts([1], 1);
 
         $this->trackPageview($tracker, 'page-2');
-        $this->assertCounts(1, 2, 1);
+        $this->assertCounts([2], 1);
 
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
         // track second action with user id
         $this->logInUser($tracker);
         $this->trackPageview($tracker, 'page-3');
-        $this->assertCounts(1, 3, 1);
+        $this->assertCounts([3], 1);
 
         // expect changed visitor id
         $visitorId2 = $this->getVisitProperty('idvisitor', 1);
         $this->assertNotEquals($visitorId1, $visitorId2);
 
         $this->trackPageview($tracker, 'page-3');
-        $this->assertCounts(1, 4, 1);
+        $this->assertCounts([4], 1);
     }
 
     // user logs in during a visit, custom User ID is only provided for the log in action
@@ -178,35 +179,35 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
-        $this->assertCounts(1, 1, 1);
+        $this->assertCounts([1], 1);
 
         $this->trackPageview($tracker, 'page-2');
-        $this->assertCounts(1, 2, 1);
+        $this->assertCounts([2], 1);
 
         $this->trackAction($tracker, 'action-1');
-        $this->assertCounts(1, 3, 1);
+        $this->assertCounts([3], 1);
 
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
         // track second action with user id
         $this->logInUser($tracker);
         $this->trackAction($tracker, 'log-in');
-        $this->assertCounts(1, 4, 1);
+        $this->assertCounts([4], 1);
 
         // expect changed visitor id
         $visitorId2 = $this->getVisitProperty('idvisitor', 1);
         $this->assertNotEquals($visitorId1, $visitorId2);
 
         $this->trackAction($tracker, 'action-2');
-        $this->assertCounts(1, 5, 1);
+        $this->assertCounts([5], 1);
 
         $this->trackPageview($tracker, 'page-3');
-        $this->assertCounts(1, 6, 1);
+        $this->assertCounts([6], 1);
 
         // log out and de-set user id
         $this->logOutUser($tracker);
         $this->trackAction($tracker, 'log-out');
-        $this->assertCounts(1, 7, 1);
+        $this->assertCounts([7], 1);
 
         // expect original visitor id after logging out
         $visitorId3 = $this->getVisitProperty('idvisitor', 1);
@@ -214,7 +215,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->assertNotEquals($visitorId2, $visitorId3);
 
         $this->trackAction($tracker, 'action-3');
-        $this->assertCounts(1, 8, 1);
+        $this->assertCounts([8], 1);
     }
 
     public function testUserLogsInAndOutDuringVisitWithoutActions()
@@ -222,29 +223,29 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
-        $this->assertCounts(1, 1, 1);
+        $this->assertCounts([1], 1);
 
         $this->trackPageview($tracker, 'page-2');
-        $this->assertCounts(1, 2, 1);
+        $this->assertCounts([2], 1);
 
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
         // track second action with user id
         $this->logInUser($tracker);
         $this->trackPageview($tracker, 'page-3');
-        $this->assertCounts(1, 3, 1);
+        $this->assertCounts([3], 1);
 
         // expect changed visitor id
         $visitorId2 = $this->getVisitProperty('idvisitor', 1);
         $this->assertNotEquals($visitorId1, $visitorId2);
 
         $this->trackPageview($tracker, 'page-4');
-        $this->assertCounts(1, 4, 1);
+        $this->assertCounts([4], 1);
 
         // log out and de-set user id
         $this->logOutUser($tracker);
         $this->trackPageview($tracker, 'page-5');
-        $this->assertCounts(1, 5, 1);
+        $this->assertCounts([5], 1);
 
         // expect original visitor id after logging out
         $visitorId3 = $this->getVisitProperty('idvisitor', 1);
@@ -252,7 +253,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->assertNotEquals($visitorId2, $visitorId3);
 
         $this->trackPageview($tracker, 'page-6');
-        $this->assertCounts(1, 6, 1);
+        $this->assertCounts([6], 1);
     }
 
     public function testUserLoggedInOnMultipleDevices()
@@ -264,7 +265,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackAction($trackerDevice1, 'action-1');
         $this->logInUser($trackerDevice1);
         $this->trackAction($trackerDevice1, 'log-in');
-        $this->assertCounts(1, 4, 1);
+        $this->assertCounts([4], 1);
 
         $trackerDevice2 = $this->getTrackerForAlternateDevice();
 
@@ -274,8 +275,13 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->logInUser($trackerDevice2);
         $this->trackAction($trackerDevice2, 'log-in');
 
-        $this->assertCounts(2, 8, 2);
-        $this->assertVisitorIdsCount(2); // TODO - discuss with product that new device forms a new visit
+        // TODO: It may be unexpected that the last action of the second visit(or) is actually attributed to the first
+        // visit(or). This is caused by the way how existing visits are looked up.
+        // After the login a userid is provided. Therefor Matomo tracker looks for an existing visit by prioritizing the
+        // userid (=visitorid). As a visit is found it will be resumed - instead of updating the actually running one
+
+        $this->assertCounts([5, 3], 2);
+        $this->assertVisitorIdsCount(2);
 
         // multiple devices, multiple config IDs
         $this->assertConfigIdsCount(2);
@@ -289,7 +295,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackPageview($trackerDevice1, 'page-2');
         $this->logInUser($trackerDevice1);
         $this->trackPageview($trackerDevice1, 'page-3');
-        $this->assertCounts(1, 3, 1);
+        $this->assertCounts([3], 1);
 
         $trackerDevice2 = $this->getTrackerForAlternateDevice();
 
@@ -298,8 +304,13 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->logInUser($trackerDevice2);
         $this->trackPageview($trackerDevice2, 'page-6');
 
-        $this->assertCounts(2, 6, 2);
-        $this->assertVisitorIdsCount(2); // TODO - discuss with product that new device forms a new visit
+        // TODO: It may be unexpected that the last action of the second visit(or) is actually attributed to the first
+        // visit(or). This is caused by the way how existing visits are looked up.
+        // After the login a userid is provided. Therefor Matomo tracker looks for an existing visit by prioritizing the
+        // userid (=visitorid). As a visit is found it will be resumed - instead of updating the actually running one
+
+        $this->assertCounts([4, 2], 2);
+        $this->assertVisitorIdsCount(2);
 
         // multiple devices, multiple config IDs
         $this->assertConfigIdsCount(2);
@@ -316,18 +327,18 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackAction($tracker, 'log-in');
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
-        $this->assertCounts(1, 4, 1);
+        $this->assertCounts([4], 1);
 
         $this->trackAction($tracker, 'action-2');
         $this->trackPageview($tracker, 'page-3');
 
-        $this->assertCounts(1, 6, 1);
+        $this->assertCounts([6], 1);
 
         $this->logOutUser($tracker);
         $this->trackAction($tracker, 'log-out');
         $visitorId2 = $this->getVisitProperty('idvisitor', 1);
 
-        $this->assertCounts(1, 7, 1, 1);
+        $this->assertCounts([7], 1, 1);
 
         // force new visit and log in
         $tracker = $this->getTracker();
@@ -339,17 +350,17 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackAction($tracker, 'log-in');
         $visitorId3 = $this->getVisitProperty('idvisitor', 2);
 
-        $this->assertCounts(2, 10, 2);
+        $this->assertCounts([7, 3], 2);
 
         $this->trackAction($tracker, 'action-4');
         $this->trackPageview($tracker, 'page-5');
 
-        $this->assertCounts(2, 12, 2);
+        $this->assertCounts([7, 5], 2);
 
         $this->logOutUser($tracker);
         $this->trackAction($tracker, 'log-out');
         $visitorId4 = $this->getVisitProperty('idvisitor', 2);
-        $this->assertCounts(2, 13, 2);
+        $this->assertCounts([7, 6], 2);
 
         // TODO: check when there's no action after the log out action, the idvisitor is empty
 
@@ -358,6 +369,44 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->assertNotEquals($visitorId2, $visitorId4);
 
         $this->assertUserIdsCount(1);
+    }
+
+    public function testNewVisitWithLoginAndLogoutCombination()
+    {
+        // track a first visit (without login)
+        $tracker = $this->getTracker();
+
+        $this->trackPageview($tracker, 'page-1');
+        $this->trackPageview($tracker, 'page-2');
+
+        $this->assertCounts([2], 1);
+
+        // force a new visit of the same visitor (with login and logout)
+        $tracker->setForceNewVisit();
+        $this->trackPageview($tracker, 'page-1');
+
+        $this->assertCounts([2, 1], 1);
+        $visitorId1 = $this->getVisitProperty('idvisitor', 2);
+
+        $this->logInUser($tracker);
+        $this->trackPageview($tracker, 'page-3');
+
+        $visitorId2 = $this->getVisitProperty('idvisitor', 2);
+        $this->assertNotEquals($visitorId1, $visitorId2);
+        // logging in causes the visitor id to change, therefore we afterwards have 2 different
+        $this->assertCounts([2, 2], 2);
+
+        $this->logOutUser($tracker);
+        $this->trackPageview($tracker, 'page-5');
+
+        // TODO: It may be unexpected that the last action of the second visit is actually attributed to the first
+        // visit. This is caused by the way how existing visits are looked up.
+        // After the login a userid is provided. Therefor Matomo tracker updates the visitorid of the second visit,
+        // while the visitorid of the first visit remains. As the php tracker still has the original visitorid set,
+        // after logout this visitorid will be used again to look for an existing visit.
+        // This causes the last action to be attributed to the first visit.
+
+        $this->assertCounts([3, 2], 2);
     }
 
     public function testUserLogsInAndOutMultipleTimesWithoutActions()
@@ -370,17 +419,17 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackPageview($tracker, 'page-3');
         $visitorId1 = $this->getVisitProperty('idvisitor', 1);
 
-        $this->assertCounts(1, 3, 1);
+        $this->assertCounts([3], 1);
 
         $this->trackPageview($tracker, 'page-4');
 
-        $this->assertCounts(1, 4, 1);
+        $this->assertCounts([4], 1);
 
         $this->logOutUser($tracker);
         $this->trackPageview($tracker, 'page-5');
         $visitorId2 = $this->getVisitProperty('idvisitor', 1);
 
-        $this->assertCounts(1, 5, 1, 1);
+        $this->assertCounts([5], 1, 1);
 
         // force new visit and log in
         $tracker = $this->getTracker();
@@ -391,15 +440,15 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackPageview($tracker, 'page-7');
         $visitorId3 = $this->getVisitProperty('idvisitor', 2);
 
-        $this->assertCounts(2, 7, 2);
+        $this->assertCounts([5, 2], 2);
 
         $this->trackPageview($tracker, 'page-5');
-        $this->assertCounts(2, 8, 2);
+        $this->assertCounts([5, 3], 2);
 
         $this->logOutUser($tracker);
         $this->trackPageview($tracker, 'page-6');
         $visitorId4 = $this->getVisitProperty('idvisitor', 2);
-        $this->assertCounts(2, 9, 2);
+        $this->assertCounts([5, 4], 2);
 
         $this->assertEquals($visitorId1, $visitorId3);
         // since we forced a new visit, the visitor id after second log out is different
@@ -427,7 +476,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackAction($tracker, 'action-5');
         $visitorId2 = $this->getVisitProperty('idvisitor', 2);
 
-        $this->assertCounts(2, 7, 1, 1, 1);
+        $this->assertCounts([4, 3], 1, 1);
         $this->assertEquals($visitorId1, $visitorId2);
 
         // move time beyond default visit length
@@ -435,7 +484,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
         $this->trackPageview($tracker, 'page-5');
 
-        $this->assertCounts(3, 8, 1, 1, 1);
+        $this->assertCounts([4, 3, 1], 1, 1);
     }
 
     public function testNewVisitTriggeredAtMidnight()
@@ -451,7 +500,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackPageview($tracker, 'page-3');
         $this->trackAction($tracker, 'action-3');
 
-        $this->assertCounts(2, 4, 1);
+        $this->assertCounts([2, 2], 1);
     }
 
     public function testNewVisitWhenCampaignChanges()
@@ -464,13 +513,12 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $tracker->setUrl('http://www.example.com/?utm_campaign=second');
         $this->trackPageview($tracker, 'page-2');
 
-        $this->assertCounts(2, 2, 1);
+        $this->assertCounts([1, 1], 1);
     }
 
-    private function assertCounts(int $visits, int $actions, int $visitorIds, int $userIds = null, int $configIds = null)
+    private function assertCounts(array $visitsWithActionCount, int $visitorIds, int $userIds = null, int $configIds = null)
     {
-        $this->assertVisitCount($visits);
-        $this->assertActionCount($actions);
+        $this->assertVisitsWithActionCount($visitsWithActionCount);
         $this->assertVisitorIdsCount($visitorIds);
         if (!is_null($userIds)) {
             $this->assertUserIdsCount($userIds);
@@ -480,10 +528,13 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         }
     }
 
-    private function assertVisitCount($expected)
+    private function assertVisitsWithActionCount($visitsWithActionCount)
     {
-        $visitCount = Db::fetchOne("SELECT COUNT(*) FROM " . Common::prefixTable('log_visit'));
-        $this->assertEquals($expected, $visitCount);
+        $sql = 'SELECT COUNT(DISTINCT(a.idlink_va)) as actions FROM %1$s v LEFT JOIN %2$s a ON v.idvisit = a.idvisit GROUP BY v.idvisit';
+        $visitCount = Db::fetchAll(
+            sprintf($sql, Common::prefixTable('log_visit'), Common::prefixTable('log_link_visit_action'))
+        );
+        $this->assertEquals($visitsWithActionCount, array_column($visitCount, 'actions'));
     }
 
     private function assertActionCount($expected)
