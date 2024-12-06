@@ -18,7 +18,7 @@ class HostPortExtractorTest extends \PHPUnit\Framework\TestCase
     {
         $IpWithPort = '127.0.0.1:3000';
         $extractedIPandPort = HostPortExtractor::extract($IpWithPort);
- 
+
         $this->assertEquals($extractedIPandPort->host, '127.0.0.1');
         $this->assertEquals($extractedIPandPort->port, '3000');
     }
@@ -63,7 +63,7 @@ class HostPortExtractorTest extends \PHPUnit\Framework\TestCase
         $IPv6WithPort = '[2001:db8:3333:4444:5555:6666:7777:8888]:3000';
         $extractedIPandPort = HostPortExtractor::extract($IPv6WithPort);
 
-        $this->assertEquals($extractedIPandPort->host,'[2001:db8:3333:4444:5555:6666:7777:8888]');
+        $this->assertEquals($extractedIPandPort->host, '[2001:db8:3333:4444:5555:6666:7777:8888]');
         $this->assertEquals($extractedIPandPort->port, '3000');
     }
 

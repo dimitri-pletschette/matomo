@@ -41,7 +41,7 @@ class HostPortExtractor
             } else {
                 return null;
             }
-        } catch (InvalidArgumentException) {
+        } catch (InvalidArgumentException $e) {
             return null;
         }
     }
@@ -65,7 +65,11 @@ class HostPortExtractor
              * and that text is considered valid IPv6 as per filter_var()
              */
             if (count($listOfTextInsideSquareBrackets) > 0 &&
-                filter_var($listOfTextInsideSquareBrackets[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
+                filter_var(
+                    $listOfTextInsideSquareBrackets[0], 
+                    FILTER_VALIDATE_IP, 
+                    FILTER_FLAG_IPV6
+                ) !== false) {
                 return true;
             }
         }
