@@ -174,8 +174,10 @@ class FormDatabaseSetup extends QuickForm2
         );
 
         $extractedHostAndPort = HostPortExtractor::extract($dbInfos['host']);
-        $dbInfos['host'] = $extractedHostAndPort->host;
-        $dbInfos['port'] = $extractedHostAndPort->port;
+        if (!is_null($extractedHostAndPort)) {
+            $dbInfos['host'] = $extractedHostAndPort->host;
+            $dbInfos['port'] = $extractedHostAndPort->port;
+        }
 
         try {
             @Db::createDatabaseObject($dbInfos);

@@ -27,9 +27,9 @@ class HostPortExtractor
      * database server host.
      *
      * @param string $dbHost The user provided host to extract values from
-     * @return HostPortExtractor Extracted Host and Port
+     * @return HostPortExtractor|null Extracted Host and Port, null if nothing can be extracted
      */
-    public static function extract(string $dbHost): HostPortExtractor
+    public static function extract(string $dbHost): ?HostPortExtractor
     {
         try {
             if (self::isIPv6($dbHost)) {
@@ -38,11 +38,12 @@ class HostPortExtractor
                 return self::extractUnixSocket($dbHost);
             } elseif (self::isIPWithPort($dbHost)) {
                 return self::extractIPAndPort($dbHost);
+            } else {
+                return null;
             }
         } catch (InvalidArgumentException) {
-            return new HostPortExtractor($dbHost, '');
+            return null;
         }
-        return new HostPortExtractor($dbHost, '');
     }
 
     /**
@@ -153,7 +154,8 @@ class HostPortExtractor
      */
     private static function isIPWithPort(string $dbHost): bool
     {
-        return (strpos($dbHost, ':') !== false);
+        $numColons = substr_count($dbHost, ':');
+        return ($numColons === 1);
     }
 
     /**
