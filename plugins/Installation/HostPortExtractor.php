@@ -71,7 +71,7 @@ class HostPortExtractor
                     FILTER_VALIDATE_IP,
                     FILTER_FLAG_IPV6
                 ) !== false
-                ) {
+            ) {
                 return true;
             }
         }
