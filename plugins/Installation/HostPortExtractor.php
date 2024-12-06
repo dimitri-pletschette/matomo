@@ -13,8 +13,8 @@ use InvalidArgumentException;
 
 class HostPortExtractor
 {
-    public string $host;
-    public string $port;
+    public $host;
+    public $port;
 
     private function __construct(string $host, string $port)
     {
@@ -65,11 +65,7 @@ class HostPortExtractor
              * and that text is considered valid IPv6 as per filter_var()
              */
             if (count($listOfTextInsideSquareBrackets) > 0 &&
-                filter_var(
-                    $listOfTextInsideSquareBrackets[0],
-                    FILTER_VALIDATE_IP,
-                    FILTER_FLAG_IPV6
-                    ) !== false) {
+                filter_var($listOfTextInsideSquareBrackets[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
                 return true;
             }
         }
@@ -103,7 +99,6 @@ class HostPortExtractor
             // check if the text is a valid port e.g. ':3000'
             preg_match('/^(:\d+)$/', $components[1], $portMatches);
             if (count($portMatches) > 0) {
-
                 // only save the port number, not the colon
                 $port = substr($portMatches[1], 1);
             }

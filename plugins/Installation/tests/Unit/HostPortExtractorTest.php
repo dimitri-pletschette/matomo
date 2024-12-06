@@ -10,7 +10,7 @@ class HostPortExtractorTest extends \PHPUnit\Framework\TestCase
     {
         $IP = '127.0.0.1';
         $extractedIPandPort = HostPortExtractor::extract($IP);
-        
+
         $this->assertNull($extractedIPandPort);
     }
 
@@ -18,12 +18,12 @@ class HostPortExtractorTest extends \PHPUnit\Framework\TestCase
     {
         $IpWithPort = '127.0.0.1:3000';
         $extractedIPandPort = HostPortExtractor::extract($IpWithPort);
-        
+ 
         $this->assertEquals($extractedIPandPort->host, '127.0.0.1');
         $this->assertEquals($extractedIPandPort->port, '3000');
     }
 
-    public function testAddressNoPort() 
+    public function testAddressNoPort()
     {
         $address = 'localhost';
         $extractedIPandPort = HostPortExtractor::extract($address);
@@ -71,7 +71,7 @@ class HostPortExtractorTest extends \PHPUnit\Framework\TestCase
     {
         $IPv6Short = '[2001::8888]';
         $extractedIP = HostPortExtractor::extract($IPv6Short);
-        
+
         $this->assertEquals($extractedIP->host, '[2001::8888]');
         $this->assertEquals($extractedIP->port, '');
     }
