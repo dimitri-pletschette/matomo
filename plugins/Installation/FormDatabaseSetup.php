@@ -173,9 +173,9 @@ class FormDatabaseSetup extends QuickForm2
             'enable_ssl'    => false
         );
 
-        $extractedHostAndPort = self::extractHostAndPort($dbInfos['host']);
-        $dbInfos['host'] = $extractedHostAndPort['host'];
-        $dbInfos['port'] = $extractedHostAndPort['port'];
+        $extractedHostAndPort = HostPortExtractor::extract($dbInfos['host']);
+        $dbInfos['host'] = $extractedHostAndPort->host;
+        $dbInfos['port'] = $extractedHostAndPort->port;
 
         try {
             @Db::createDatabaseObject($dbInfos);
@@ -197,151 +197,6 @@ class FormDatabaseSetup extends QuickForm2
         }
 
         return $dbInfos;
-    }
-
-    /**
-     * Extracts the correctly formatted host and port values from the user-provided
-     * database server host.
-     *
-     * @param string $dbHost The user provided host to extract values from
-     * @return array{host: string, port: string} Extracted Host and Port
-     */ 
-    private function extractHostAndPort($dbHost) {
-
-        if (self::isIPv6($dbHost)) {
-            return self::extractIPv6($dbHost);
-        } else if (self::isUnixSocket($dbHost)) {
-            return self::extractUnixSocket($dbHost);
-        } else if (self::isIPWithPort($dbHost)) {
-            return self::extractIPAndPort($dbHost);
-        }
-
-        // default behaviour is to return the provided host
-        return [
-            'host' => $dbHost, 
-            'port' => ''
-        ];
-    }
-
-    /**
-     * Determines if the provided host is correctly formatted IPv6
-     *
-     * @param string $dbHost The user provided database server host
-     * @return boolean Whether the provided host is correct IPv6
-     */
-    private function isIPv6($dbHost) {
-        if (strpos($dbHost, '[') !== false && strpos($dbHost, ']') !== false) {
-            // host contains opening and closing square brackets
-            preg_match_all('/\[(.*?)\]/', $dbHost, $matches);
-            $internal = $matches[1];
-            // filter_var requires valid IPv6 addresses to not be encased in brackets
-            if (count($internal) > 0 && filter_var($internal[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Extracts the Host and Port from a user provided database server host,
-     * assuming the provided host is a IPv^ address, with or without a port
-     *
-     * @param string $dbHost The user provided database server host
-     * @return array{host: string, port: string} The extracted Host & Port
-     */
-    private function extractIPv6($dbHost) {
-        $host = '';
-        $port = '';
-
-        if (!self::isIPv6($dbHost)) return ['host' => $host, 'port' => $port];
-
-        preg_match_all('/\[(.*?)\]/', $dbHost, $matches);
-        $internal = $matches[1];
-
-        $components = explode("]", $dbHost);
-        if (count($components) > 1) {
-            // there is content after the closing square bracket 
-            preg_match('/^(:\d+)$/', $components[1], $portMatches);
-            if (count($portMatches) > 0) {
-                // content after is valid format for a port number
-                $port = substr($portMatches[1], 1);
-            }
-        }
-        // db connector requires IPv6 to be encased in square brackets
-        $host = "[" . $internal[0] . "]";
-
-        return [
-            'host' => $host, 
-            'port' => $port
-        ];
-    }
-
-    /**
-     * Determines if the provided host is a Unix Socket
-     *
-     * @param string $dbHost The user provided database server host
-     * @return boolean Whether the provided host is a unix socket
-     */
-    private function isUnixSocket($dbHost) {
-        return (strpos($dbHost, '/') !== false);
-    }
-
-    /**
-     * Extracts the host & port from the user provided database server host,
-     * assuming the provided host is a unix socket
-     *
-     * @param string $dbHost The user provided database server host
-     * @return array{host: string, port: string} The extracted Host & Port
-     */
-    private function extractUnixSocket($dbHost) {
-        $host = '';
-        $port = '';
-        
-        if (!self::isUnixSocket($dbHost)) return ['host' => $host, 'port' => $port];
-
-        $portIndex = strpos($dbHost, '/');
-            // unix_socket=/path/sock.n
-        $port = substr($dbHost, $portIndex);
-
-        return [
-            'host' => $host,
-            'port' => $port
-        ];
-    }
-
-    /**
-     * Determines if the providedhost is a standard web address or IP with a port
-     *
-     * @param string $dbHost The user provided database server host
-     * @return boolean Whether the provided host is a standard address or IP with port
-     */
-    private function isIPWithPort($dbHost) {
-        return (strpos($dbHost, ':') !== false);
-    }
-
-    /**
-     * Extracts the host & port from the user provided database server host, 
-     * assuming the provided host is a standard address or IP with a port
-     *
-     * @param string $dbHost The user provided database server host
-     * @return array{host: string, port: string} The extracted host & port
-     */
-    private function extractIPAndPort($dbHost) {
-        $host = '';
-        $port = '';
-
-        if (!self::isIPWithPort($dbHost)) return ['host' => $host, 'port' => $port];
-
-        $portIndex = strpos($dbHost, ':');
-        // host:port
-        $port = substr($dbHost, $portIndex + 1);
-        $host = substr($dbHost, 0, $portIndex);
-
-        return [
-            'host' => $host,
-            'port' => $port
-        ];
     }
 }
 

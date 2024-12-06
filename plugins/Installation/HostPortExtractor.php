@@ -1,0 +1,179 @@
+<?php
+
+/**
+ * Matomo - free/libre analytics platform
+ *
+ * @link    https://matomo.org
+ * @license https://www.gnu.org/licenses/gpl-3.0.html GPL v3 or later
+ */
+
+namespace Piwik\Plugins\Installation;
+
+use InvalidArgumentException;
+
+class HostPortExtractor 
+{
+    public string $host;
+    public string $port;
+
+    private function __construct(string $host, string $port)
+    {
+        $this->host = $host;
+        $this->port = $port;
+    } 
+
+    /**
+     * Extracts the correctly formatted host and port values from the user-provided
+     * database server host.
+     *
+     * @param string $dbHost The user provided host to extract values from
+     * @return HostPortExtractor Extracted Host and Port
+     */ 
+    public static function extract(string $dbHost) : HostPortExtractor 
+    {
+        try {
+            if (self::isIPv6($dbHost)) {
+                return self::extractIPv6($dbHost);
+            } else if (self::isUnixSocket($dbHost)) {
+                return self::extractUnixSocket($dbHost);
+            } else if (self::isIPWithPort($dbHost)) {
+                return self::extractIPAndPort($dbHost);
+            }
+        } catch (InvalidArgumentException) {
+            return new HostPortExtractor($dbHost, '');
+        } 
+        return new HostPortExtractor($dbHost, '');
+    }
+
+    /**
+     * Determines if the provided host is correctly formatted IPv6
+     *
+     * @param string $dbHost The user provided database server host
+     * @return boolean Whether the provided host is correct IPv6
+     */
+    private static function isIPv6(string $dbHost) : bool
+    {
+        // IPv6 addresses must contain '[' & ']' to be considered valid
+        if (strpos($dbHost, '[') !== false && strpos($dbHost, ']') !== false) {
+
+            // filter_var requires potential IPv6 addresses to not be encased
+            preg_match_all('/\[(.*?)\]/', $dbHost, $matches);
+            $listOfTextInsideSquareBrackets = $matches[1];
+
+            /*
+             * Only return true if there is some text inside square brackets,
+             * and that text is considered valid IPv6 as per filter_var()
+             */
+            if (count($listOfTextInsideSquareBrackets) > 0 && 
+                filter_var($listOfTextInsideSquareBrackets[0], 
+                            FILTER_VALIDATE_IP, 
+                            FILTER_FLAG_IPV6) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Extracts the Host and Port from a user provided database server host,
+     * assuming the provided host is a IPv6 address, with or without a port
+     *
+     * @param string $dbHost The user provided database server host
+     * @throws InvalidArgumentException if the provided dbHost is not a valid IPv6
+     * @return HostPortExtractor The extracted Host & Port
+     */
+    private static function extractIPv6(string $dbHost) : HostPortExtractor
+    {
+        if (!self::isIPv6($dbHost)) {
+            throw new InvalidArgumentException('$dbHost must be a valid IPv6 address');
+        }
+
+        // find and extract the text inside square brackets: []
+        preg_match_all('/\[(.*?)\]/', $dbHost, $matches);
+        $listOfTextInsideSquareBrackets = $matches[1];
+
+        $port = '';
+
+        // extract text after closing bracket to search for port
+        $components = explode(']', $dbHost);
+        if (count($components) > 1) {
+            
+            // check if the text is a valid port e.g. ':3000'
+            preg_match('/^(:\d+)$/', $components[1], $portMatches);
+            if (count($portMatches) > 0) {
+
+                // only save the port number, not the colon
+                $port = substr($portMatches[1], 1);
+            }
+        }
+        // db connector requires IPv6 to be encased in square brackets
+        $host = '[' . $listOfTextInsideSquareBrackets[0] . ']';
+
+        return new HostPortExtractor($host, $port);
+    }
+
+    /**
+     * Determines if the provided host is a Unix Socket
+     *
+     * @param string $dbHost The user provided database server host
+     * @return boolean Whether the provided host is a unix socket
+     */
+    private static function isUnixSocket(string $dbHost) : bool
+    {
+        return (strpos($dbHost, '/') !== false);
+    }
+
+    /**
+     * Extracts the host & port from the user provided database server host,
+     * assuming the provided host is a unix socket
+     *
+     * @param string $dbHost The user provided database server host
+     * @throws InvalidArgumentException if the provided dbHost is not a valid Unix Socket
+     * @return HostPortExtractor The extracted Host & Port
+     */
+    private static function extractUnixSocket(string $dbHost) : HostPortExtractor
+    {
+        if (!self::isUnixSocket($dbHost)) {
+            throw new InvalidArgumentException('$dbHost must be a valid Unix Socket');
+        }
+
+        $portIndex = strpos($dbHost, '/');
+            // unix_socket=/path/sock.n
+        $port = substr($dbHost, $portIndex);
+        
+        return new HostPortExtractor('', $port);
+    }
+
+    /**
+     * Determines if the providedhost is a standard web address or IP with a port
+     *
+     * @param string $dbHost The user provided database server host
+     * @return boolean Whether the provided host is a standard address or IP with port
+     */
+    private static function isIPWithPort(string $dbHost) : bool 
+    {
+        return (strpos($dbHost, ':') !== false);
+    }
+
+    /**
+     * Extracts the host & port from the user provided database server host, 
+     * assuming the provided host is a standard address or IP with a port
+     *
+     * @param string $dbHost The user provided database server host
+     * @throws InvalidArgumentException if the provided dbHost is not a valid address with a port
+     * @return HostPortExtractor The extracted host & port
+     */
+    private static function extractIPAndPort(string $dbHost) : HostPortExtractor 
+    {
+        if (!self::isIPWithPort($dbHost)) {
+            throw new InvalidArgumentException('$dbHost must be a valid address');
+        }
+
+        $hostAndPort = explode(':', $dbHost);
+        $host = $hostAndPort[0];
+        $port = $hostAndPort[1];
+        
+        return new HostPortExtractor($host, $port);
+    }
+}
