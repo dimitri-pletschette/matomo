@@ -148,7 +148,7 @@ class HostPortExtractor
     }
 
     /**
-     * Determines if the providedhost is a standard web address or IP with a port
+     * Determines if the provided host is a standard web address or IP with a port
      *
      * @param string $dbHost The user provided database server host
      * @return boolean Whether the provided host is a standard address or IP with port
@@ -173,9 +173,7 @@ class HostPortExtractor
             throw new InvalidArgumentException('$dbHost must be a valid address');
         }
 
-        $hostAndPort = explode(':', $dbHost);
-        $host = $hostAndPort[0];
-        $port = $hostAndPort[1];
+        [$host, $port] = explode(':', $dbHost);
 
         return new HostPortExtractor($host, $port);
     }
