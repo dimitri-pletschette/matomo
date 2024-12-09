@@ -140,8 +140,11 @@ class HostPortExtractor
             throw new InvalidArgumentException('$dbHost must be a valid Unix Socket');
         }
 
+        /*
+         * The DB connector requires unix sockets to be provided as ports in 
+         * order to connect successfully.
+         */
         $portIndex = strpos($dbHost, '/');
-            // unix_socket=/path/sock.n
         $port = substr($dbHost, $portIndex);
 
         return new HostPortExtractor('', $port);
