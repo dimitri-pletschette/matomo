@@ -30,12 +30,17 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     private $trackerEventTsIterator;
 
+    private $testEnv;
+
+    private $userIdOverwritesVisitorId = 1;
+
     public function setUp(): void
     {
         parent::setUp();
 
         Fixture::createWebsite('2012-01-01 00:00:00');
 
+        $this->testEnv = static::$fixture->getTestEnvironment();
         $this->trackerEventTsIterator = Date::factory(self::FIRST_VISIT_TIME)->getTimestamp();
     }
 
@@ -61,6 +66,26 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     private function logOutUser(\MatomoTracker $tracker)
     {
         $tracker->setUserId(false);
+    }
+
+    private function enableUserIdOverwritesVisitorId()
+    {
+        if ($this->userIdOverwritesVisitorId !== 1) {
+            $this->userIdOverwritesVisitorId = 1;
+
+            $this->testEnv->overrideConfig('Tracker', 'enable_userid_overwrites_visitorid', 1);
+            $this->testEnv->save();
+        }
+    }
+
+    private function disableUserIdOverwritesVisitorId()
+    {
+        if ($this->userIdOverwritesVisitorId !== 0) {
+            $this->userIdOverwritesVisitorId = 0;
+
+            $this->testEnv->overrideConfig('Tracker', 'enable_userid_overwrites_visitorid', 0);
+            $this->testEnv->save();
+        }
     }
 
     private function getTracker()
@@ -94,6 +119,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     // user does not log in during a visit, all actions are assigned to a single visitor ID
     public function testUserDoesNotLogInDuringVisit()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
@@ -118,6 +144,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     // user id replaces visitor id and there is still only one distinct value, but is different
     public function testUserLogsInDuringVisit()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
@@ -149,6 +176,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     public function testUserLogsInDuringVisitWithoutActions()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
@@ -176,6 +204,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
     // user id replaces visitor id and there is still only one distinct value, but is different
     public function testUserLogsInAndOutDuringVisit()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
@@ -220,6 +249,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     public function testUserLogsInAndOutDuringVisitWithoutActions()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
@@ -258,6 +288,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     public function testUserLoggedInOnMultipleDevices()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $trackerDevice1 = $this->getTracker();
 
         $this->trackPageview($trackerDevice1, 'page-1');
@@ -289,6 +320,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     public function testUserLoggedInOnMultipleDevicesWithoutActions()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $trackerDevice1 = $this->getTracker();
 
         $this->trackPageview($trackerDevice1, 'page-1');
@@ -318,6 +350,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     public function testUserLogsInAndOutMultipleTimes()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
@@ -411,6 +444,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     public function testUserLogsInAndOutMultipleTimesWithoutActions()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
@@ -459,6 +493,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     public function testNewVisitTriggeredByInactivity()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
@@ -489,6 +524,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     public function testNewVisitTriggeredAtMidnight()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $this->trackPageview($tracker, 'page-1');
@@ -505,6 +541,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
 
     public function testNewVisitWhenCampaignChanges()
     {
+        $this->enableUserIdOverwritesVisitorId();
         $tracker = $this->getTracker();
 
         $tracker->setUrl('http://www.example.com/?utm_campaign=first');
