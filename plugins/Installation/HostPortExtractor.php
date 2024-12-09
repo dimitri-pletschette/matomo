@@ -138,7 +138,7 @@ class HostPortExtractor
         }
 
         /*
-         * The DB connector requires unix sockets to be provided as ports in 
+         * The DB connector requires unix sockets to be provided as ports in
          * order to connect successfully.
          */
         $portIndex = strpos($dbHost, '/');

@@ -6,7 +6,8 @@ use Piwik\Plugins\Installation\HostPortExtractor;
 
 class HostPortExtractorTest extends \PHPUnit\Framework\TestCase
 {
-    public function validInputs() {
+    public function validInputs()
+    {
         return [
             ['127.0.0.1:3000', ['127.0.0.1', '3000']],
             ['localhost:3000', ['localhost', '3000']],
@@ -34,7 +35,8 @@ class HostPortExtractorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validInputs
      */
-    public function testValidDbHosts($input, $expected) {
+    public function testValidDbHosts($input, $expected)
+    {
         $extractedHostAndPort = HostPortExtractor::extract($input);
         $this->assertEquals($extractedHostAndPort->host, $expected[0]);
         $this->assertEquals($extractedHostAndPort->port, $expected[1]);
