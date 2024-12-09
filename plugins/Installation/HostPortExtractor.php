@@ -54,28 +54,24 @@ class HostPortExtractor
      */
     private static function isIPv6(string $dbHost): bool
     {
-        // IPv6 addresses must contain '[' & ']' to be considered valid
-        if (strpos($dbHost, '[') !== false && strpos($dbHost, ']') !== false) {
-            // filter_var requires potential IPv6 addresses to not be encased
-            preg_match_all('/\[(.*?)\]/', $dbHost, $matches);
-            $listOfTextInsideSquareBrackets = $matches[1];
+        // filter_var requires potential IPv6 addresses to not be encased
+        preg_match_all('/^\[(.*?)\]/', $dbHost, $matches);
+        $listOfTextInsideSquareBrackets = $matches[1];
 
-            /*
-             * Only return true if there is some text inside square brackets,
-             * and that text is considered valid IPv6 as per filter_var()
-             */
-            if (
-                count($listOfTextInsideSquareBrackets) > 0 &&
-                filter_var(
-                    $listOfTextInsideSquareBrackets[0],
-                    FILTER_VALIDATE_IP,
-                    FILTER_FLAG_IPV6
-                ) !== false
-            ) {
-                return true;
-            }
+        /*
+         * Only return true if there is some text inside square brackets,
+         * and that text is considered valid IPv6 as per filter_var()
+         */
+        if (
+            count($listOfTextInsideSquareBrackets) > 0 &&
+            filter_var(
+                $listOfTextInsideSquareBrackets[0],
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_IPV6
+            ) !== false
+        ) {
+            return true;
         }
-
         return false;
     }
 
@@ -101,12 +97,13 @@ class HostPortExtractor
 
         // extract text after closing bracket to search for port
         $components = explode(']', $dbHost);
-        if (count($components) > 1) {
+        if (count($components) > 1 && strlen($components[1]) > 0) {
             // check if the text is a valid port e.g. ':3000'
-            preg_match('/^(:\d+)$/', $components[1], $portMatches);
+            preg_match('/^:(\d+)$/', $components[1], $portMatches);
             if (count($portMatches) > 0) {
-                // only save the port number, not the colon
-                $port = substr($portMatches[1], 1);
+                $port = $portMatches[1];
+            } else {
+                throw new InvalidArgumentException('$dbHost port is invalid');
             }
         }
         // db connector requires IPv6 to be encased in square brackets
