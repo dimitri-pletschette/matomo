@@ -8,6 +8,7 @@
  */
 
 describe('UserIdVisitorId', function () {
+
   const liveApiUrl = `${page.baseUrl}index.php?idSite=all&module=API&method=Live.getLastVisitsDetails&format=json`;
   const siteUrl = config.piwikUrl + 'tests/resources/overlay-test-site-real/user-id-visitor-id.php';
 
@@ -90,7 +91,21 @@ describe('UserIdVisitorId', function () {
     await page.waitForNetworkIdle();
   }
 
-  describe('user id overwrites visitor id', function () {
+  async function disableVisitorIdOverwriteByUserId() {
+    testEnvironment.configOverride.Tracker = {
+      enable_userid_overwrites_visitorid: '0',
+    };
+    testEnvironment.save();
+  }
+
+  async function enableVisitorIdOverwriteByUserId() {
+    testEnvironment.configOverride.Tracker = {
+      enable_userid_overwrites_visitorid: '1',
+    };
+    testEnvironment.save();
+  }
+
+  describe('user id overwrites visitor id when config is set', function () {
     beforeEach(async function () {
       // clear cookies to avoid tests affecting each other
       // and generate new visits where we don't expect
@@ -98,6 +113,9 @@ describe('UserIdVisitorId', function () {
 
       // set our default custom user agent
       await page.setUserAgent(chromeUserAgent);
+
+      // ensure config is set to override
+      await enableVisitorIdOverwriteByUserId();
 
       // move tracker to the next day
       trackerDate += 86400 * 1000;
@@ -518,6 +536,459 @@ describe('UserIdVisitorId', function () {
       await goToSite();
       await trackPageView('page-2');
       await trackAction('action-2');
+      await assertCounts([2], 1);
+
+      visits = await fetchLastVisitDetails();
+
+      const visitId2 = visits[0].idVisit;
+      const visitorId2 = visits[0].visitorId;
+
+      expect(visitId1).to.be.not.equal(visitId2);
+      expect(visitorId1).to.be.equal(visitorId2);
+    });
+
+    it('tracks new visit when campaign changes', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1?utm_campaign=first');
+
+      await goToSite();
+      await trackPageView('page-1?utm_campaign=second');
+
+      await assertCounts([1, 1], 1);
+    });
+  });
+
+  describe('user id does not overwrite visitor id when config is not set', function () {
+    beforeEach(async function () {
+      // clear cookies to avoid tests affecting each other
+      // and generate new visits where we don't expect
+      await page.clearCookies();
+
+      // set our default custom user agent
+      await page.setUserAgent(chromeUserAgent);
+
+      // ensure config is set to override
+      await disableVisitorIdOverwriteByUserId();
+
+      // move tracker to the next day
+      trackerDate += 86400 * 1000;
+      trackerEventOffset = 0;
+    });
+
+    it('tracks user that does not log in during visit', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await assertCounts([1], 1);
+
+      await goToSite();
+      await trackPageView('page-2');
+      await assertCounts([2], 1);
+      await trackAction('action-1');
+      await assertCounts([3], 1);
+
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-3');
+      await assertCounts([3, 1], 1);
+      await trackAction('action-2');
+      await assertCounts([3, 2], 1);
+    });
+
+    it('tracks user that logs in during visit', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await assertCounts([1], 1);
+
+      await goToSite();
+      await trackPageView('page-2');
+      await assertCounts([2], 1);
+      await trackAction('action-1');
+      await assertCounts([3], 1);
+
+      const visitorId1 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // log in user
+      await goToSite({ userId: this.test.title });
+      await trackAction('log-in');
+      await assertCounts([4], 1);
+
+      const visitorId2 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // visitor id should not have changed
+      expect(visitorId1).to.be.equal(visitorId2);
+
+      await trackAction('action-2');
+      await assertCounts([5], 1);
+
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-3');
+      await assertCounts([6], 1);
+    });
+
+    it('tracks user that logs in during visit without actions', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await assertCounts([1], 1);
+
+      await goToSite();
+      await trackPageView('page-2');
+      await assertCounts([2], 1);
+
+      const visitorId1 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // log in user
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-3');
+      await assertCounts([3], 1);
+
+      const visitorId2 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // visitor id should have be the same
+      expect(visitorId1).to.be.equal(visitorId2);
+
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-4');
+      await assertCounts([4], 1);
+    });
+
+    it('tracks user that logs in and out during visit', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await assertCounts([1], 1);
+
+      await goToSite();
+      await trackPageView('page-2');
+      await assertCounts([2], 1);
+      await trackAction('action-1');
+      await assertCounts([3], 1);
+
+      const visitorId1 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // log in user
+      await goToSite({ userId: this.test.title });
+      await trackAction('log-in');
+      await assertCounts([4], 1);
+
+      const visitorId2 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // visitor id should have not changed
+      expect(visitorId1).to.be.equal(visitorId2);
+
+      await trackAction('action-2');
+      await assertCounts([5], 1);
+
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-3');
+      await assertCounts([6], 1);
+
+      // log out user
+      await goToSite();
+      await trackAction('log-out');
+      await assertCounts([7], 1);
+
+      const visitorId3 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // expect first visitor id after log out
+      expect(visitorId3).to.be.equal(visitorId1);
+      expect(visitorId2).to.be.equal(visitorId3);
+
+      await trackAction('action-3');
+      await assertCounts([8], 1);
+    });
+
+    it('tracks user that logs in and out during visit without actions', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await assertCounts([1], 1);
+
+      await goToSite();
+      await trackPageView('page-2');
+      await assertCounts([2], 1);
+
+      const visitorId1 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // log in user
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-3');
+      await assertCounts([3], 1);
+
+      const visitorId2 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // visitor id should be the same
+      expect(visitorId1).to.be.equal(visitorId2);
+
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-4');
+      await assertCounts([4], 1);
+
+      // log out user
+      await goToSite();
+      await trackPageView('page-5');
+      await assertCounts([5], 1);
+
+      const visitorId3 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // expect first visitor id after log out
+      expect(visitorId1).to.be.equal(visitorId3);
+      expect(visitorId2).to.be.equal(visitorId3);
+
+      await trackPageView('page-6');
+      await assertCounts([6], 1);
+    });
+
+    it('tracks user that logs in on different devices', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await goToSite();
+      await trackPageView('page-2');
+      await trackAction('action-1');
+      await goToSite({ userId: this.test.title });
+      await trackAction('log-in');
+      await assertCounts([4], 1);
+
+      // switch device
+      await page.clearCookies();
+      await page.setUserAgent(safariUserAgent);
+
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-3');
+      await goToSite();
+      await trackPageView('page-4');
+      await trackAction('action-2');
+      await goToSite({ userId: this.test.title });
+      await trackAction('log-in');
+      await assertCounts([4, 4], 2);
+
+      // expect different fingerprints for different devices
+      const visits = await fetchLastVisitDetails();
+
+      expect(visits[0].fingerprint).to.not.be.equal(visits[1].fingerprint);
+    });
+
+    it('tracks user that logs in on different devices without actions', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await goToSite();
+      await trackPageView('page-2');
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-3');
+      await assertCounts([3], 1);
+
+      // switch device
+      await page.clearCookies();
+      await page.setUserAgent(safariUserAgent);
+
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-4');
+      await goToSite();
+      await trackPageView('page-5');
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-6');
+      await assertCounts([3, 3], 2);
+
+      // expect different fingerprints for different devices
+      const visits = await fetchLastVisitDetails();
+
+      expect(visits[0].fingerprint).to.not.be.equal(visits[1].fingerprint);
+    });
+
+    it('tracks user that logs in and out multiple times', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await goToSite();
+      await trackPageView('page-2');
+      await trackAction('action-1');
+      await goToSite({ userId: this.test.title });
+      await trackAction('log-in');
+      await assertCounts([4], 1);
+
+      const visitorId1 = (await fetchLastVisitDetails())[0].visitorId;
+
+      await goToSite({ userId: this.test.title });
+      await trackAction('action-2');
+      await trackPageView('page-3');
+      await assertCounts([6], 1);
+
+      await goToSite();
+      await trackAction('log-out');
+      await assertCounts([7], 1);
+
+      const visitorId2 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // force new visit and log in
+      await goToSite({ forceNewVisit: true });
+      await trackAction('action-3');
+      await trackPageView('page-4');
+      await goToSite({ userId: this.test.title });
+      await trackAction('log-in');
+      await assertCounts([7, 3], 1);
+
+      const visitorId3 = (await fetchLastVisitDetails())[1].visitorId;
+
+      await goToSite({ userId: this.test.title });
+      await trackAction('action-4');
+      await trackPageView('page-5');
+      await assertCounts([7, 5], 1);
+
+      await goToSite();
+      await trackAction('log-out');
+      await assertCounts([7, 6], 1);
+
+      const visitorId4 = (await fetchLastVisitDetails())[1].visitorId;
+
+      // check visitor id combinations
+      // cookies prevent new visitorId from new visit
+      // compared to the `UserIdVisitorIdTest` integration test
+      expect(visitorId1).to.be.equal(visitorId2);
+      expect(visitorId1).to.be.equal(visitorId3);
+      expect(visitorId1).to.be.equal(visitorId4);
+    });
+
+    it('tracks user that logs in and out multiple times without actions', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await goToSite();
+      await trackPageView('page-2');
+      await goToSite({ userId: this.test.title });
+      await trackPageView('log-in');
+      await assertCounts([3], 1);
+
+      const visitorId1 = (await fetchLastVisitDetails())[0].visitorId;
+
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-4');
+      await assertCounts([4], 1);
+
+      await goToSite();
+      await trackPageView('log-out');
+      await assertCounts([5], 1);
+
+      const visitorId2 = (await fetchLastVisitDetails())[0].visitorId;
+
+      // force new visit and log in
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-6');
+      await goToSite({ userId: this.test.title });
+      await trackPageView('log-in');
+      await assertCounts([5, 2], 1);
+
+      const visitorId3 = (await fetchLastVisitDetails())[1].visitorId;
+
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-7');
+      await assertCounts([5, 3], 1);
+
+      // await page.clearCookies();
+      await goToSite();
+      await trackPageView('log-out');
+      await assertCounts([5, 4], 1);
+
+      const visitorId4 = (await fetchLastVisitDetails())[1].visitorId;
+
+      // check visitor id combinations
+      // cookies prevent new visitorId from new visit
+      // compared to the `UserIdVisitorIdTest` integration test
+      expect(visitorId1).to.be.equal(visitorId2);
+      expect(visitorId1).to.be.equal(visitorId3);
+      expect(visitorId3).to.be.equal(visitorId4);
+    });
+
+    it('tracks user with new visit and login/logout combination', async function () {
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await goToSite();
+      await trackPageView('page-2');
+      await assertCounts([2], 1);
+
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-3');
+      await assertCounts([2, 1], 1);
+
+      const visitorId1 = (await fetchLastVisitDetails())[1].visitorId;
+
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-4');
+      await assertCounts([2, 2], 1);
+
+      const visitorId2 = (await fetchLastVisitDetails())[1].visitorId;
+
+      // visitor id of second visit stays the same
+      expect(visitorId1).to.be.equal(visitorId2);
+
+      await goToSite();
+      await trackPageView('page-5');
+      await assertCounts([2, 3], 1);
+    });
+
+    it('tracks new visit due to inactivity', async function () {
+      const initialTrackerDate = trackerDate;
+
+      let visits;
+
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await goToSite();
+      await trackPageView('page-2');
+      await trackAction('action-1');
+      await goToSite({ userId: this.test.title });
+      await trackAction('log-in');
+      await assertCounts([4], 1);
+
+      visits = await fetchLastVisitDetails();
+
+      const visitorId1 = visits[0].visitorId;
+      const userId1 = visits[0].userId;
+
+      // move tracker date beyond default visit length (6 hours should be enough)
+      trackerDate += (6 * 3600) * 1000;
+
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-3');
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-4');
+      await trackAction('action-5');
+      await assertCounts([4, 3], 1);
+
+      visits = await fetchLastVisitDetails();
+
+      const visitorId2 = visits[0].visitorId;
+      const userId2 = visits[0].userId;
+
+      expect(visitorId1).to.be.equal(visitorId2);
+      expect(userId1).to.be.equal(userId2);
+
+      // move tracker date beyond default visit length (6 hours should be enough)
+      trackerDate += (6 * 3600) * 1000;
+
+      await goToSite({ userId: this.test.title });
+      await trackPageView('page-5');
+      await assertCounts([4, 3, 1], 1);
+
+      // reset tracker date back to initial value for next test
+      trackerDate = initialTrackerDate;
+    });
+
+    it('tracks new visit at midnight', async function () {
+      let visits;
+
+      await goToSite({ forceNewVisit: true });
+      await trackPageView('page-1');
+      await trackAction('action-1');
+      await assertCounts([2], 1);
+
+      visits = await fetchLastVisitDetails();
+
+      const visitId1 = visits[0].idVisit;
+      const visitorId1 = visits[0].visitorId;
+
+      // move tracker date to next day
+      trackerDate += 86400 * 1000;
+
+      await goToSite();
+      await trackPageView('page-2');
+      await trackAction('action-2');
+
+      // counting is done for actions of a single day only
+      // previous day visit has to be compared separately
       await assertCounts([2], 1);
 
       visits = await fetchLastVisitDetails();
