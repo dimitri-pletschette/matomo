@@ -634,7 +634,7 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $visitorId2 = $this->getVisitProperty('idvisitor', 1);
         $this->assertEquals($visitorId1, $visitorId2);
 
-        $this->trackPageview($tracker, 'page-3');
+        $this->trackPageview($tracker, 'page-4');
         $this->assertCounts([4], 1);
     }
 
@@ -955,8 +955,8 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         // move time by a day
         $this->trackerEventTsIterator += 24 * 60 * 60;
 
-        $this->trackPageview($tracker, 'page-3');
-        $this->trackAction($tracker, 'action-3');
+        $this->trackPageview($tracker, 'page-2');
+        $this->trackAction($tracker, 'action-2');
 
         $this->assertCounts([2, 2], 1);
     }
