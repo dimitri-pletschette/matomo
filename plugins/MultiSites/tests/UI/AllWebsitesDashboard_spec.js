@@ -158,7 +158,7 @@ describe('AllWebsitesDashboard', function () {
             await page.goto(dashboardUrl);
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site Ecommerce');
             expect(await getSitesPagination()).to.equal('1–10 of 15');
 
             await page.type('.siteSearch input', 'Site 15');
@@ -211,7 +211,7 @@ describe('AllWebsitesDashboard', function () {
             await page.waitForNetworkIdle();
 
             expect(await getPeriodSelectorTitle()).to.equal('2013-01-23');
-            expect(await getSitesTableCell(1, 2)).to.equal('2');
+            expect(await getSitesTableCell(1, 2)).to.equal('6');
 
             await page.click('.periodSelector .move-period-prev');
             await page.waitForNetworkIdle();
@@ -228,16 +228,16 @@ describe('AllWebsitesDashboard', function () {
             await page.goto(dashboardUrl);
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
-            expect(await getSitesTableCell(1, 2)).to.equal('2');
-            expect(await getSitesTableCell(2, 1)).to.equal('Site 2');
-            expect(await getSitesTableCell(2, 2)).to.equal('1');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site Ecommerce');
+            expect(await getSitesTableCell(1, 2)).to.equal('6');
+            expect(await getSitesTableCell(2, 1)).to.equal('Site Goal Default Value');
+            expect(await getSitesTableCell(2, 2)).to.equal('3');
 
             // reverse default "visits" sorting
             await page.click('.sitesTableSort.sitesTableSortDesc');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.not.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.not.equal('Site Ecommerce');
             expect(await getSitesTableCell(1, 2)).to.equal('0');
         });
 
@@ -246,18 +246,18 @@ describe('AllWebsitesDashboard', function () {
             await page.click('.sitesTable th:nth-child(1)');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site 5');
 
             await page.click('.sitesTablePagination .dataTableNext');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 11');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site 15');
             expect(await getSitesPagination()).to.equal('11–15 of 15');
 
             await page.click('.sitesTablePagination .dataTablePrevious');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site 5');
             expect(await getSitesPagination()).to.equal('1–10 of 15');
         });
 
@@ -266,16 +266,16 @@ describe('AllWebsitesDashboard', function () {
             await page.click('.sitesTable th:nth-child(4)');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
-            expect(await getSitesTableCell(1, 4)).to.equal('4');
-            expect(await getSitesTableCell(2, 1)).to.equal('Site 3');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site Ecommerce');
+            expect(await getSitesTableCell(1, 4)).to.equal('6');
+            expect(await getSitesTableCell(2, 1)).to.equal('Site Goal Event Value');
             expect(await getSitesTableCell(2, 4)).to.equal('4');
 
             // reverse sorting
             await page.click('.sitesTable th:nth-child(4)');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.not.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.not.equal('Site Ecommerce');
             expect(await getSitesTableCell(1, 4)).to.equal('0');
         });
 
