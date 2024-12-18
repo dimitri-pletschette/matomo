@@ -293,4 +293,67 @@ describe('AllWebsitesDashboard', function () {
             expect(await page.screenshotSelector('#main')).to.matchImage('evolution_change');
         });
     });
+
+    describe('Responsive View', function () {
+        this.title = parentSuite.title; // to make sure the screenshot prefix is the same
+
+        it('should display correctly in tablet view', async function () {
+            await page.webpage.setViewport({ width: 768, height: 1024 });
+            await page.goto(dashboardUrl);
+            await page.waitForNetworkIdle();
+
+            await page.evaluate(() => {
+              window.CoreHome.Matomo.on('MultiSites.DashboardKPIs.updated', function(data) {
+                data.kpis.badges.hits = '<strong>Plan:</strong> 600K hits/month';
+                data.kpis.badges.pageviews = 'Weird Pageview Badge';
+                data.kpis.badges.revenue = 'Awesome Revenue Badge';
+                data.kpis.badges.visits = 'Terrific Visits Badge';
+              })
+            });
+
+            // change period to trigger reload of KPIS
+            await page.click('.move-period-prev');
+            await page.click('.move-period-next');
+            await page.waitForNetworkIdle();
+
+            expect(await page.screenshotSelector('#main')).to.matchImage('dashboard_tablet');
+        });
+
+        it('should display correctly in mobile view', async function () {
+            await page.webpage.setViewport({ width: 352, height: 1024 });
+
+            expect(await page.screenshotSelector('#main')).to.matchImage('dashboard_mobile');
+        });
+
+        it('should display correctly in tablet view without revenue', async function () {
+            testEnvironment.pluginsToUnload = ['Goals'];
+            testEnvironment.save();
+
+            await page.webpage.setViewport({ width: 768, height: 1024 });
+            await page.goto(dashboardUrl);
+            await page.waitForNetworkIdle();
+
+            await page.evaluate(() => {
+              window.CoreHome.Matomo.on('MultiSites.DashboardKPIs.updated', function(data) {
+                data.kpis.badges.hits = '<strong>Plan:</strong> 600K hits/month';
+                data.kpis.badges.pageviews = 'Weird Pageview Badge';
+                data.kpis.badges.revenue = 'Awesome Revenue Badge';
+                data.kpis.badges.visits = 'Terrific Visits Badge';
+              })
+            });
+
+            // change period to trigger reload of KPIS
+            await page.click('.move-period-prev');
+            await page.click('.move-period-next');
+            await page.waitForNetworkIdle();
+
+            expect(await page.screenshotSelector('#main')).to.matchImage('dashboard_tablet_no_revenue');
+        });
+
+        it('should display correctly in mobile view without revenue', async function () {
+            await page.webpage.setViewport({ width: 352, height: 1024 });
+
+            expect(await page.screenshotSelector('#main')).to.matchImage('dashboard_mobile_no_revenue');
+        });
+    });
 });
