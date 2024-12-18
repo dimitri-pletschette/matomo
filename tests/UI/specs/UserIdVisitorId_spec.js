@@ -415,8 +415,6 @@ describe('UserIdVisitorId', function () {
         await trackAction('log-out');
 
         if (enableUserIdOverwritesVisitorId) {
-          // cookies move post-logout action to different visit
-          // compared to the `UserIdVisitorIdTest` integration test
           await assertCounts([8, 5], 2);
         } else {
           await assertCounts([7, 6], 1);
@@ -429,8 +427,6 @@ describe('UserIdVisitorId', function () {
           expect(visitorId1).to.be.equal(visitorId3);
           expect(visitorId1).to.be.equal(visitorId4);
         } else {
-          // cookies prevent new visitorId from new visit
-          // compared to the `UserIdVisitorIdTest` integration test
           expect(visitorId1).to.be.equal(visitorId2);
           expect(visitorId1).to.be.equal(visitorId3);
           expect(visitorId3).to.be.equal(visitorId4);
@@ -459,51 +455,35 @@ describe('UserIdVisitorId', function () {
         const visitorId2 = (await fetchLastVisitDetails())[0].visitorId;
 
         // force new visit and log in
+        await page.clearCookies();
         await goToSite({ forceNewVisit: true });
         await trackPageView('page-6');
         await goToSite({ userId: this.test.title });
         await trackPageView('log-in');
 
-        if (enableUserIdOverwritesVisitorId) {
-          await assertCounts([5, 2], 2);
-        } else {
-          await assertCounts([5, 2], 1);
-        }
+        await assertCounts([5, 2], 2);
 
         const visitorId3 = (await fetchLastVisitDetails())[1].visitorId;
 
         await goToSite({ userId: this.test.title });
         await trackPageView('page-7');
 
-        if (enableUserIdOverwritesVisitorId) {
-          await assertCounts([5, 3], 2);
-        } else {
-          await assertCounts([5, 3], 1);
-        }
+        await assertCounts([5, 3], 2);
 
-        // await page.clearCookies();
         await goToSite();
         await trackPageView('log-out');
 
-        if (enableUserIdOverwritesVisitorId) {
-          // cookies move post-logout action to different visit
-          // compared to the `UserIdVisitorIdTest` integration test
-          await assertCounts([6, 3], 2);
-        } else {
-          await assertCounts([5, 4], 1);
-        }
+        await assertCounts([5, 4], 2);
 
         const visitorId4 = (await fetchLastVisitDetails())[1].visitorId;
 
         if (enableUserIdOverwritesVisitorId) {
           expect(visitorId1).to.not.be.equal(visitorId2);
           expect(visitorId1).to.be.equal(visitorId3);
-          expect(visitorId1).to.be.equal(visitorId4);
+          expect(visitorId2).to.be.not.equal(visitorId4);
         } else {
-          // cookies prevent new visitorId from new visit
-          // compared to the `UserIdVisitorIdTest` integration test
           expect(visitorId1).to.be.equal(visitorId2);
-          expect(visitorId1).to.be.equal(visitorId3);
+          expect(visitorId1).to.be.not.equal(visitorId3);
           expect(visitorId3).to.be.equal(visitorId4);
         }
       });
@@ -524,18 +504,14 @@ describe('UserIdVisitorId', function () {
         await goToSite({ userId: this.test.title });
         await trackPageView('page-4');
 
-        if (enableUserIdOverwritesVisitorId) {
-          await assertCounts([2, 2], 2);
-        } else {
-          await assertCounts([2, 2], 1);
-        }
-
         const visitorId2 = (await fetchLastVisitDetails())[1].visitorId;
 
         if (enableUserIdOverwritesVisitorId) {
           expect(visitorId1).to.be.not.equal(visitorId2);
+          await assertCounts([2, 2], 2);
         } else {
           expect(visitorId1).to.be.equal(visitorId2);
+          await assertCounts([2, 2], 1);
         }
 
         await goToSite();
