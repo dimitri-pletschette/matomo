@@ -18,7 +18,7 @@
 
   <div v-if="errorLoading">
       <div class="notification system notification-error">
-        {{ translate('MultiSites_AllWebsitesDashboardErrorMessage', '', '') }}
+        {{ translate('MultiSites_AllWebsitesDashboardErrorMessage') }}
         <br /><br />
         {{ translate('General_NeedMoreHelp', '', '') }}
         <a
