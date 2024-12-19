@@ -31,7 +31,7 @@ describe("Live", function () {
         await page.evaluate(() => $('.dataTableVizVisitorLog .repeat.icon-refresh').click());
         await page.mouse.move(-10, -10);
 
-        var report = await page.$('.dataTableVizVisitorLog .card.row:first-child');
+        var report = await page.$('.dataTableVizVisitorLog .card.row:eq(1)');
         expect(await report.screenshot()).to.matchImage('visitor_log_expand_actions');
     });
 

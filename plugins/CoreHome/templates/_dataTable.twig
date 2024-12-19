@@ -12,7 +12,7 @@ using the show_footer to control the header actions as well since this is going 
 of moving the table actions to the top of the report for all reports, at which point the config for the report
 can be renamed to show_header and show_header_icons
 #}
-{% set showTableActionsInHeader = properties.show_footer and properties.show_footer_icons %}
+{% set showTableActionsInHeader = properties.show_footer and properties.show_footer_icons and not isWidget %}
 
 {% if showCardAsContentBlock  %}
 <div class="card">
