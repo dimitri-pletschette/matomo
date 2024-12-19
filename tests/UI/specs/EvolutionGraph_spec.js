@@ -16,10 +16,6 @@ describe("EvolutionGraph", function () {
         return testEnvironment.callApi("Annotations.deleteAll", {idSite: 3});
     });
 
-    async function showDataTableFooter() {
-        await page.hover('.dataTableFeatures');
-    }
-
     it("should load correctly", async function () {
         await page.goto(url);
         await page.waitForNetworkIdle();
@@ -56,12 +52,6 @@ describe("EvolutionGraph", function () {
         expect(await page.screenshot({ fullPage: true })).to.matchImage('two_metrics');
     });
 
-    it("should show table actions on hover", async function () {
-        await showDataTableFooter();
-
-        expect(await page.screenshot({ fullPage: true })).to.matchImage('table_actions');
-    });
-
     it("should show graph as image when export as image icon clicked", async function () {
         await page.click('#dataTableFooterExportAsImageIcon');
         await page.waitForNetworkIdle();
@@ -74,7 +64,6 @@ describe("EvolutionGraph", function () {
         const element = await page.jQuery('.ui-dialog .ui-widget-header button:visible');
         await element.click();
 
-        await showDataTableFooter();
         await page.click('.limitSelection input');
         await page.evaluate(function () {
             $('.limitSelection ul li:contains(60) span').click();
@@ -86,7 +75,6 @@ describe("EvolutionGraph", function () {
 
     // annotations tests
     it("should show annotations when annotation icon on x-axis clicked", async function () {
-        await showDataTableFooter();
         await page.click('.limitSelection input');
         await page.evaluate(function () {
             $('.limitSelection ul li:contains(30) span').click(); // change limit back
@@ -101,7 +89,6 @@ describe("EvolutionGraph", function () {
     });
 
     it("should show all annotations when annotations footer link clicked", async function () { // TODO: fails
-        await showDataTableFooter();
         await page.click('.annotationView');
         await page.waitForNetworkIdle();
 
@@ -110,7 +97,6 @@ describe("EvolutionGraph", function () {
 
     it("should show no annotations message when no annotations for site", async function () {
         await page.goto(page.url().replace(/idSite=[^&]*/, "idSite=3") + "&columns=nb_visits");
-        await showDataTableFooter();
         await page.click('.annotationView');
         await page.waitForNetworkIdle();
 
@@ -196,7 +182,7 @@ describe("EvolutionGraph", function () {
             height: 768,
         });
         await page.reload();
-        await showDataTableFooter();
+        await page.waitForNetworkIdle();
         await page.click('.activatePeriodsSelection:last');
 
         await page.mouse.move(-10, -10);
@@ -218,7 +204,7 @@ describe("EvolutionGraph", function () {
         testEnvironment.save();
 
         await page.goto(url);
-        await showDataTableFooter();
+        await page.waitForNetworkIdle();
         await page.click('.annotationView');
         await page.waitForNetworkIdle();
 
