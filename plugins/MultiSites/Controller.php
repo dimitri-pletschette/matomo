@@ -125,15 +125,12 @@ class Controller extends \Piwik\Plugin\Controller
             }
         }
 
-        $goalsApi = GoalsAPI::getInstance();
+        $idSites = array_column($sites, 'idsite');
+        $goals = GoalsAPI::getInstance()->getGoals($idSites);
 
-        foreach ($sites as $site) {
-            $goals = $goalsApi->getGoals($site['idsite']);
-
-            foreach ($goals as $goal) {
-                if (0.0 < $goal['revenue'] || true === (bool) $goal['event_value_as_revenue']) {
-                    return true;
-                }
+        foreach ($goals as $goal) {
+            if (0.0 < $goal['revenue'] || true === (bool) $goal['event_value_as_revenue']) {
+                return true;
             }
         }
 
