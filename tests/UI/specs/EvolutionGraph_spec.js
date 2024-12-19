@@ -183,7 +183,7 @@ describe("EvolutionGraph", function () {
         });
         await page.reload();
         await page.waitForNetworkIdle();
-        await page.click('.activatePeriodsSelection:last');
+        await (await page.jQuery('.activatePeriodsSelection:last')).click();
 
         await page.mouse.move(-10, -10);
         await page.waitForTimeout(500); // wait for animation
@@ -192,7 +192,7 @@ describe("EvolutionGraph", function () {
     });
 
     it("should be possible to change period", async function () {
-        await page.click('.dataTablePeriods [data-period=month]');
+        await (await page.jQuery('[data-period=month]:last')).click();
         await page.waitForNetworkIdle();
 
         expect(await page.screenshot({ fullPage: true })).to.matchImage('periods_selected');
