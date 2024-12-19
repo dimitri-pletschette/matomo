@@ -34,6 +34,11 @@ class SettingsMetadata
 
                     $fieldConfig = $setting->configureField();
 
+                    // jQuery Ajax calls strip away empty arrays upon serialisation, this adds it back in
+                    if ($setting->getType() === FieldConfig::TYPE_ARRAY && $value === null) {
+                        $value = [];
+                    }
+
                     if (
                         isset($value) && (
                         $fieldConfig->uiControl !== FieldConfig::UI_CONTROL_PASSWORD ||
