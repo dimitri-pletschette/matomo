@@ -642,6 +642,26 @@ class Model
     }
 
     /**
+     * Update an existing visit in the DB
+     *
+     * @param int $idvisit
+     * @param string $idVisitor
+     *
+     * @throws Db\DbException
+     */
+    public function updateVisitorIDForConversion($idvisit, $idVisitor): void
+    {
+        $table = Common::prefixTable('log_conversion');
+        $sqlQuery = "UPDATE $table SET idvisitor = ? WHERE idvisit = ?";
+
+        $sqlBind = [];
+        $sqlBind[] = $idVisitor;
+        $sqlBind[] = $idvisit;
+
+        $this->getDb()->query($sqlQuery, $sqlBind);
+    }
+
+    /**
      * Build an array of fields and bind values
      *
      * @param array $valuesToUpdate
