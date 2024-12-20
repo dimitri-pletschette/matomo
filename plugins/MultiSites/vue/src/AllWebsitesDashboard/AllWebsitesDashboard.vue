@@ -16,6 +16,31 @@
     </h1>
   </div>
 
+  <div v-if="errorLoading">
+      <div class="notification system notification-error">
+        {{ translate('MultiSites_AllWebsitesDashboardErrorMessage') }}
+        <br /><br />
+        {{ translate('General_NeedMoreHelp', '', '') }}
+        <a
+            rel="noreferrer noopener"
+            target="_blank"
+            :href="externalRawLink('https://matomo.org/faq/troubleshooting/faq_19489/')"
+        >{{ translate('General_Faq') }}</a>
+        &#x2013;
+        <a
+            rel="noreferrer noopener"
+            target="_blank"
+            :href="externalRawLink('https://forum.matomo.org/')"
+        >{{ translate('Feedback_CommunityHelp') }}</a>
+        &#x2013;
+        <a
+            rel="noreferrer noopener"
+            target="_blank"
+            :href="externalRawLink('https://matomo.org/support-plans/')"
+        >{{ translate('Feedback_ProfessionalHelp') }}</a>.
+      </div>
+  </div>
+
   <KPICardContainer
       :is-loading="isLoadingKPIs"
       :model-value="kpis"
@@ -120,6 +145,9 @@ export default defineComponent({
     },
     isLoadingKPIs(): boolean {
       return DashboardStore.state.value.isLoadingKPIs;
+    },
+    errorLoading(): boolean {
+      return DashboardStore.state.value.errorLoading;
     },
     kpis(): KPICardData[] {
       const { dashboardKPIs } = DashboardStore.state.value;

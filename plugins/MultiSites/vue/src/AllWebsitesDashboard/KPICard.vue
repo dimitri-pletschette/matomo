@@ -20,9 +20,9 @@
       <template v-if="kpi.evolutionValue !== ''">
         <span :class="`kpiCardEvolutionTrend ${evolutionTrendClass}`">
           <span :class="`kpiCardEvolutionIcon ${evolutionTrendIcon}`" />
-          {{ kpi.evolutionValue }}
+          {{ kpi.evolutionValue }}&nbsp;
         </span>
-        {{ translate(evolutionTrendFrom) }}
+        <span>{{ translate(evolutionTrendFrom) }}</span>
       </template>
 
       <template v-else>

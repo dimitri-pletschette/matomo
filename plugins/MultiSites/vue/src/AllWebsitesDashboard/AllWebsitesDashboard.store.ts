@@ -242,10 +242,12 @@ class DashboardStore {
     if (this.searchTerm) {
       params.pattern = this.searchTerm;
     }
-
     return AjaxHelper.fetch<GetAllWithGroupsDataResponse>(
       params,
-      { abortController: this.fetchAbort },
+      {
+        abortController: this.fetchAbort,
+        createErrorNotification: false,
+      },
     ).then((response) => {
       if (!onlySites) {
         this.updateDashboardKPIs(response);

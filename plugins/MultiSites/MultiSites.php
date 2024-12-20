@@ -90,6 +90,7 @@ class MultiSites extends \Piwik\Plugin
         $translations[] = 'MultiSites_TotalHits';
         $translations[] = 'MultiSites_TotalPageviews';
         $translations[] = 'MultiSites_TotalVisits';
+        $translations[] = 'MultiSites_AllWebsitesDashboardErrorMessage';
     }
 
     public function getStylesheetFiles(&$stylesheets)
