@@ -456,6 +456,11 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         $this->trackAction($tracker, 'log-out');
         $visitorId4 = $this->getVisitProperty('idvisitor', 2);
         if ($userIdOverwritesVisitorId) {
+            // TODO: It may be unexpected that the last action of the second visit(or) is actually attributed to the first
+            // visit(or). This is caused by the way how existing visits are looked up.
+            // After the login a userid is provided. Therefor Matomo tracker looks for an existing visit by prioritizing the
+            // userid (=visitorid). As a visit is found it will be resumed - instead of updating the actually running one
+
             $this->assertCounts([8, 5], 2);
         } else {
             $this->assertCounts([7, 6], 1);
@@ -468,6 +473,90 @@ class UserIdVisitorIdTest extends IntegrationTestCase
         } else {
             $this->assertEquals($visitorId1, $visitorId2);
             $this->assertEquals($visitorId1, $visitorId3);
+            $this->assertEquals($visitorId3, $visitorId4);
+        }
+
+        $this->assertUserIdsCount(1);
+    }
+
+    /**
+     * @dataProvider getUserIdOverwritesVisitorIdSetting
+     */
+    public function testUserLogsInAndOutMultipleTimesWithInitialVisitBeforeTimeFrame(bool $userIdOverwritesVisitorId)
+    {
+        $this->configureUserIdOverwritesVisitorId($userIdOverwritesVisitorId);
+        $tracker = $this->getTracker();
+
+        $this->trackPageview($tracker, 'page-1');
+        $this->trackPageview($tracker, 'page-2');
+        $this->trackAction($tracker, 'action-1');
+        $this->logInUser($tracker);
+        $this->trackAction($tracker, 'log-in');
+        $visitorId1 = $this->getVisitProperty('idvisitor', 1);
+
+        $this->assertCounts([4], 1);
+
+        $this->trackAction($tracker, 'action-2');
+        $this->trackPageview($tracker, 'page-3');
+
+        $this->assertCounts([6], 1);
+
+        $this->logOutUser($tracker);
+        $this->trackAction($tracker, 'log-out');
+        $visitorId2 = $this->getVisitProperty('idvisitor', 1);
+
+        $this->assertCounts([7], 1, 1);
+
+        // force new visit after end of default visit length and log in
+        // By not creating a new tracker instance here, the random visitorid won't change
+        // This is similar to using cookies in browser, where visitorid would be persisted
+        $this->trackerEventTsIterator += Config::getInstance()->Tracker['visit_standard_length'] + 1;
+        $tracker->setForceNewVisit();
+
+        $this->trackAction($tracker, 'action-3');
+        $this->trackPageview($tracker, 'page-4');
+        $this->logInUser($tracker);
+        $this->trackAction($tracker, 'log-in');
+        $visitorId3 = $this->getVisitProperty('idvisitor', 2);
+
+        if ($userIdOverwritesVisitorId) {
+            $this->assertCounts([7, 3], 2);
+        } else {
+            $this->assertCounts([7, 3], 1);
+        }
+
+        $this->trackAction($tracker, 'action-4');
+        $this->trackPageview($tracker, 'page-5');
+
+        if ($userIdOverwritesVisitorId) {
+            $this->assertCounts([7, 5], 2);
+        } else {
+            $this->assertCounts([7, 5], 1);
+        }
+
+        $this->logOutUser($tracker);
+        $this->trackAction($tracker, 'log-out');
+        if ($userIdOverwritesVisitorId) {
+            // TODO: It may be unexpected that the last action of the second visit(or) creates a new visit
+            // This is caused by the way how existing visits are looked up.
+            // After the login a userid is provided. Therefor Matomo tracker looks for an existing visit by prioritizing the
+            // userid (=visitorid). As no one can be found it creates a new one - instead of updating the actually running one
+
+            $visitorId4 = $this->getVisitProperty('idvisitor', 3);
+            $this->assertCounts([7, 5, 1], 2);
+        } else {
+            $visitorId4 = $this->getVisitProperty('idvisitor', 2);
+            $this->assertCounts([7, 6], 1);
+        }
+
+        if ($userIdOverwritesVisitorId) {
+            $this->assertNotEquals($visitorId1, $visitorId2);
+            $this->assertEquals($visitorId1, $visitorId3);
+            $this->assertNotEquals($visitorId1, $visitorId4);
+            $this->assertEquals($visitorId2, $visitorId4);
+        } else {
+            $this->assertEquals($visitorId1, $visitorId2);
+            $this->assertEquals($visitorId2, $visitorId3);
             $this->assertEquals($visitorId3, $visitorId4);
         }
 
