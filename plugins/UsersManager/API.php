@@ -1113,9 +1113,16 @@ class API extends \Piwik\Plugin\API
             $this->checkAccessType($access);
         }
 
-        $currentUser = Piwik::getCurrentUserLogin();
-
         $idSites = $this->getIdSitesCheckAdminAccess($idSites);
+
+        // Get current permissions per ID site
+        $idSitesAndAccess = [];
+
+        foreach ($idSites as $siteId) {
+            if ($foundAccess = $this->model->getAccessForUserForSite($userLogin, $siteId)) {
+                $idSitesAndAccess[$siteId] = $foundAccess;
+            }
+        }
 
         // check password confirmation only when using session auth and setting view access for anonymous user
         if ($userLogin === 'anonymous' && Request::fromRequest()->getBoolParameter('force_api_session', false) && $access === 'view') {
@@ -1158,17 +1165,22 @@ class API extends \Piwik\Plugin\API
         $this->checkUserExist($userLogin);
         $this->checkUsersHasNotSuperUserAccess($userLogin);
 
-
         if ($access === 'noaccess') {
             $this->model->deleteUserAccess($userLogin, $idSites);
             // if the access is noaccess then we don't save it as this is the default value
             // when no access are specified
             Piwik::postEvent('UsersManager.removeSiteAccess', [$userLogin, $idSites]);
         } else {
-            $success = $this->model->updateUserAccessConditionally($userLogin, $idSites, $access);
 
-            if ($success === false) {
-                throw new Exception('Concurrency problem');
+            if (empty($idSitesAndAccess)) {
+                $this->model->addUserAccess($userLogin, $access, $idSites);
+            }
+
+            foreach ($idSitesAndAccess as $idSite => $previousAccess) {
+                $success = $this->model->updateUserAccessConditionally($userLogin, $idSite, $access, $previousAccess);
+                if ($success === false) {
+                    throw new Exception('Concurrency problem');
+                }
             }
         }
 

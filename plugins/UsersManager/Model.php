@@ -113,6 +113,25 @@ class Model
         return $return;
     }
 
+    public function getAccessForUserForSite(string $userLogin, int $idSite): ?string
+    {
+        $db = $this->getDb();
+
+        $accessResults = $db->fetchOne(
+            "SELECT access FROM " . Common::prefixTable("access") . " WHERE login = ? AND idsite = ?",
+            [
+                $userLogin,
+                $idSite
+            ]
+        );
+
+        if ($accessResults === false) {
+            return null;
+        }
+
+        return (string) $accessResults;
+    }
+
     public function getUsersAccessFromSite($idSite)
     {
         $db = $this->getDb();
@@ -722,33 +741,9 @@ class Model
         }
     }
 
-    public function updateUserAccessConditionally(string $userLogin, array $idSites, string $access): bool
+    public function updateUserAccessConditionally(string $userLogin, int $idSite, string $newAccess, string $previousAccess): bool
     {
         $db = $this->getDb();
-
-        $placeholders = implode(',', array_fill(0, count($idSites), '?'));
-
-        $siteAccessResults = $db->query(
-            "SELECT idsite, access FROM " . Common::prefixTable("access") . " WHERE login = ? AND idsite IN ($placeholders)",
-            array_merge([$userLogin], $idSites)
-        );
-
-        if ($siteAccessResults->rowCount() === 0) {
-            // User has no access so add it
-            $this->addUserAccess($userLogin, $access, $idSites);
-            return true;
-        }
-
-        $currentAccessByIdSite = [];
-
-        if ($siteAccessResults->rowCount() !== count($idSites)) {
-            // If the number of records found doesn't match those requested, so they are missing
-            return false;
-        }
-
-        foreach ($siteAccessResults as $row) {
-            $currentAccessByIdSite[(int)$row['idsite']] = $row['access'];
-        }
 
         $updateSql = "
             UPDATE " . Common::prefixTable("access") . "
@@ -758,12 +753,18 @@ class Model
               AND access = ?
         ";
 
-        foreach ($idSites as $idsite) {
-            $result = $db->query($updateSql, [$access, $userLogin, $idsite, $currentAccessByIdSite[$idsite]]);
-            if ($db->rowCount($result) === 0 && $currentAccessByIdSite[$idsite] !== $access) {
-                // No rows are updated meaning they couldn't be found.
-                return false;
-            }
+        $db->query($updateSql, [$newAccess, $userLogin, $idSite, $previousAccess]);
+
+        // Performing query again because rows affected won't change when $newAccess == $previousAccess
+        $selectSql = "
+            SELECT COUNT(*) FROM " . Common::prefixTable("access") . "
+            WHERE login = ?
+              AND idsite = ?
+              AND access = ?
+        ";
+
+        if ($db->fetchOne($selectSql, [$userLogin, $idSite, $newAccess]) === 0) {
+            return false;
         }
 
         return true;
