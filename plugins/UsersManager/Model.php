@@ -722,6 +722,53 @@ class Model
         }
     }
 
+    public function updateUserAccessConditionally(string $userLogin, array $idSites, string $access): bool
+    {
+        $db = $this->getDb();
+
+        $placeholders = implode(',', array_fill(0, count($idSites), '?'));
+
+        $siteAccessResults = $db->query(
+            "SELECT idsite, access FROM " . Common::prefixTable("access") . " WHERE login = ? AND idsite IN ($placeholders)",
+            array_merge([$userLogin], $idSites)
+        );
+
+        if ($siteAccessResults->rowCount() === 0) {
+            // User has no access so add it
+            $this->addUserAccess($userLogin, $access, $idSites);
+            return true;
+        }
+
+        $currentAccessByIdSite = [];
+
+        if ($siteAccessResults->rowCount() !== count($idSites)) {
+            // If the number of records found doesn't match those requested, so they are missing
+            return false;
+        }
+
+        foreach ($siteAccessResults as $row) {
+            $currentAccessByIdSite[(int)$row['idsite']] = $row['access'];
+        }
+
+        $updateSql = "
+            UPDATE " . Common::prefixTable("access") . "
+            SET access = ?
+            WHERE login = ?
+              AND idsite = ?
+              AND access = ?
+        ";
+
+        foreach ($idSites as $idsite) {
+            $result = $db->query($updateSql, [$access, $userLogin, $idsite, $currentAccessByIdSite[$idsite]]);
+            if ($db->rowCount($result) === 0 && $currentAccessByIdSite[$idsite] !== $access) {
+                // No rows are updated meaning they couldn't be found.
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function deleteUser($userLogin): void
     {
         $this->deleteUserOnly($userLogin);
