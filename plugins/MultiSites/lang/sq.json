@@ -1,6 +1,7 @@
 {
     "MultiSites": {
         "AllWebsitesDashboardDocumentation": "Ky raport ju jep një përmbledhje informuese për çdonjërin nga sajtet tuaj, me matjet më të përgjithshme rreth vizitorëve tuaj.",
+        "AllWebsitesDashboardErrorMessage": "S’merren dot të dhëna tani. Kjo mund të vijë nga një problem i përkohshëm rrjeti, ose raporti përmban shumë të dhëna. Ju lutemi, riprovoni më vonë. Nëse problemi vazhdon, ju lutemi, lidhuni për asistencë me përgjegjësin e instancës tuaj Matomo.",
         "AllWebsitesDashboardTitle": "Krejt Sajtet",
         "Evolution": "Evoluim",
         "EvolutionComparisonDay": "%1$s %2$s sot krahasohet me %3$s %2$s në periudhën e mëparshme të pjesshme (%4$s) Evoluim: %5$s",

@@ -97,6 +97,7 @@
         "SystemSummaryPiwikVersion": "Matomo-versio",
         "SystemSummaryWidget": "Järjestelmän yhteenveto",
         "TableNoData": "Ei tietoja tässä taulukossa",
+        "ThanksFromAllOfUs": "Kiitos meiltä kaikilta matomalaisilta!",
         "ThereIsNoDataForThisReport": "Tähän raporttiin ei ole tietoja.",
         "UnFlattenDataTable": "Tämä raportti on tasainen %s Muuta hierarkiseksi",
         "UndoPivotBySubtable": "Tämä raportti on käännetty %s:llä. Kumoa kääntö",
