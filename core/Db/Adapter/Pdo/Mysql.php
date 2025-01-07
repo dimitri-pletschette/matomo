@@ -18,8 +18,6 @@ use Piwik\Db\AdapterInterface;
 use Piwik\Piwik;
 use Zend_Config;
 use Zend_Db_Adapter_Pdo_Mysql;
-use Zend_Db_Select;
-use Zend_Db_Statement_Interface;
 
 /**
  */
