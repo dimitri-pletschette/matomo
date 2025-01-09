@@ -1165,6 +1165,9 @@ class API extends \Piwik\Plugin\API
         $this->checkUserExist($userLogin);
         $this->checkUsersHasNotSuperUserAccess($userLogin);
 
+        // Re-verify admin access for current user is still applicable.
+        $this->getIdSitesCheckAdminAccess($idSites);
+
         if ($access === 'noaccess') {
             $this->model->deleteUserAccess($userLogin, $idSites);
             // if the access is noaccess then we don't save it as this is the default value
