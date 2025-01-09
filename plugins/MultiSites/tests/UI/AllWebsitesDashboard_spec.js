@@ -63,13 +63,6 @@ describe('AllWebsitesDashboard', function () {
     describe('Rendering', function () {
         this.title = parentSuite.title; // to make sure the screenshot prefix is the same
 
-        afterEach(function() {
-            delete testEnvironment.configOverride.General.show_multisites_sparklines;
-            delete testEnvironment.pluginsToUnload;
-
-            testEnvironment.save();
-        });
-
         it('should load the all websites dashboard correctly', async function () {
             await page.goto(dashboardUrl);
             await page.waitForNetworkIdle();
@@ -84,24 +77,26 @@ describe('AllWebsitesDashboard', function () {
             expect(await page.screenshotSelector('#main')).to.matchImage('widgetized');
         });
 
-        it('should not display revenue if disabled', async function () {
-            testEnvironment.pluginsToUnload = ['Goals'];
-            testEnvironment.save();
+        describe('with deactivated show_multisites_sparklines configuration', function () {
+            this.title = parentSuite.title; // to make sure the screenshot prefix is the same
 
-            await page.goto(dashboardUrl);
-            await page.waitForNetworkIdle();
+            before(function () {
+                testEnvironment.overrideConfig('General', 'show_multisites_sparklines', 0);
+                testEnvironment.save();
+            });
 
-            expect(await page.screenshotSelector('#main')).to.matchImage('no_revenue');
-        });
+            after(function () {
+                delete testEnvironment.configOverride.General.show_multisites_sparklines;
 
-        it('should not display sparklines if disabled', async function () {
-            testEnvironment.overrideConfig('General', 'show_multisites_sparklines', 0);
-            testEnvironment.save();
+                testEnvironment.save();
+            });
 
-            await page.goto(dashboardUrl);
-            await page.waitForNetworkIdle();
+            it('should not display sparklines', async function () {
+                await page.goto(dashboardUrl);
+                await page.waitForNetworkIdle();
 
-            expect(await page.screenshotSelector('#main')).to.matchImage('no_sparklines');
+                expect(await page.screenshotSelector('#main')).to.matchImage('no_sparklines');
+            });
         });
 
         it('should correctly display a KPI badge when added through event', async function () {
@@ -144,6 +139,65 @@ describe('AllWebsitesDashboard', function () {
         });
     });
 
+    describe('Revenue Column', function () {
+        describe('Deactivated Goals plugin', function () {
+            this.title = parentSuite.title; // to make sure the screenshot prefix is the same
+
+            before(function () {
+                testEnvironment.pluginsToUnload = ['Goals'];
+                testEnvironment.save();
+            });
+
+            after(function () {
+              delete testEnvironment.pluginsToUnload;
+
+                testEnvironment.save();
+            });
+
+            it('should not display revenue column with deactivated Goals plugin', async function () {
+                await page.goto(dashboardUrl);
+                await page.waitForNetworkIdle();
+
+                expect(await page.screenshotSelector('#main')).to.matchImage('no_revenue');
+            });
+        });
+
+        describe('Site/Goal Configuration', function () {
+            afterEach(function () {
+                delete testEnvironment.idSitesViewAccess;
+
+                testEnvironment.save();
+            });
+
+            [
+                [1, 'Site Ecommerce', true],
+                [2, 'Site Goal Default Value', true],
+                [3, 'Site Goal Event Value', true],
+                [4, 'Site Goal Without Value', false],
+            ].forEach(async function ([siteId, siteName, shouldDisplayRevenue]) {
+                it(`${shouldDisplayRevenue ? 'should' : 'should not'} display revenue column (${siteName})`, async function () {
+                    const testUrl = dashboardUrl.replace(/idSite=\d+/, `idSite=${siteId}`);
+
+                    testEnvironment.idSitesViewAccess = [siteId];
+                    testEnvironment.save();
+
+                    await page.goto(testUrl);
+                    await page.waitForNetworkIdle();
+
+                    expect(await getSitesTableCell(1, 1)).to.equal(siteName);
+
+                    const revenueHeader = await page.jQuery('th:contains("Revenue")');
+
+                    if (shouldDisplayRevenue) {
+                        expect(revenueHeader).to.be.ok;
+                    } else {
+                        expect(revenueHeader).to.be.null;
+                    }
+                });
+            });
+        });
+    });
+
     describe('Dashboard Controls', function () {
         it('should link to the SitesManager', async function () {
             await page.goto(dashboardUrl);
@@ -158,7 +212,7 @@ describe('AllWebsitesDashboard', function () {
             await page.goto(dashboardUrl);
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site Ecommerce');
             expect(await getSitesPagination()).to.equal('1–10 of 15');
 
             await page.type('.siteSearch input', 'Site 15');
@@ -211,7 +265,7 @@ describe('AllWebsitesDashboard', function () {
             await page.waitForNetworkIdle();
 
             expect(await getPeriodSelectorTitle()).to.equal('2013-01-23');
-            expect(await getSitesTableCell(1, 2)).to.equal('2');
+            expect(await getSitesTableCell(1, 2)).to.equal('6');
 
             await page.click('.periodSelector .move-period-prev');
             await page.waitForNetworkIdle();
@@ -228,16 +282,16 @@ describe('AllWebsitesDashboard', function () {
             await page.goto(dashboardUrl);
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
-            expect(await getSitesTableCell(1, 2)).to.equal('2');
-            expect(await getSitesTableCell(2, 1)).to.equal('Site 2');
-            expect(await getSitesTableCell(2, 2)).to.equal('1');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site Ecommerce');
+            expect(await getSitesTableCell(1, 2)).to.equal('6');
+            expect(await getSitesTableCell(2, 1)).to.equal('Site Goal Default Value');
+            expect(await getSitesTableCell(2, 2)).to.equal('3');
 
             // reverse default "visits" sorting
             await page.click('.sitesTableSort.sitesTableSortDesc');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.not.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.not.equal('Site Ecommerce');
             expect(await getSitesTableCell(1, 2)).to.equal('0');
         });
 
@@ -246,18 +300,18 @@ describe('AllWebsitesDashboard', function () {
             await page.click('.sitesTable th:nth-child(1)');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site 5');
 
             await page.click('.sitesTablePagination .dataTableNext');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 11');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site 15');
             expect(await getSitesPagination()).to.equal('11–15 of 15');
 
             await page.click('.sitesTablePagination .dataTablePrevious');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site 5');
             expect(await getSitesPagination()).to.equal('1–10 of 15');
         });
 
@@ -266,16 +320,16 @@ describe('AllWebsitesDashboard', function () {
             await page.click('.sitesTable th:nth-child(4)');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.equal('Site 1');
-            expect(await getSitesTableCell(1, 4)).to.equal('4');
-            expect(await getSitesTableCell(2, 1)).to.equal('Site 3');
+            expect(await getSitesTableCell(1, 1)).to.equal('Site Ecommerce');
+            expect(await getSitesTableCell(1, 4)).to.equal('6');
+            expect(await getSitesTableCell(2, 1)).to.equal('Site Goal Event Value');
             expect(await getSitesTableCell(2, 4)).to.equal('4');
 
             // reverse sorting
             await page.click('.sitesTable th:nth-child(4)');
             await page.waitForNetworkIdle();
 
-            expect(await getSitesTableCell(1, 1)).to.not.equal('Site 1');
+            expect(await getSitesTableCell(1, 1)).to.not.equal('Site Ecommerce');
             expect(await getSitesTableCell(1, 4)).to.equal('0');
         });
 
