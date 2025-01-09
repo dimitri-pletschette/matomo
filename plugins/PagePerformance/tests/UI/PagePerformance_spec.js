@@ -120,7 +120,7 @@ describe("PagePerformance", function () {
 
     it("should load new table with performance metrics visualization", async function () {
         // hover visualization selection
-        const icon = await page.jQuery('.dropdown-content .icon-page-performance');
+        const icon = await page.jQuery('.dropdown-content .icon-page-performance:last');
         await icon.click();
         await page.mouse.move(-10, -10);
 
