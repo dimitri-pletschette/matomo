@@ -20,6 +20,7 @@ use Piwik\DbHelper;
 use Piwik\Period;
 use Piwik\Period\Range;
 use Piwik\Piwik;
+use Piwik\Plugin\SettingsProvider;
 use Piwik\Plugins\Live\Exception\MaxExecutionTimeExceededException;
 use Piwik\Segment;
 use Piwik\Site;
@@ -81,9 +82,41 @@ class Model
                 $updatedOffset = 0; // we've already skipped enough rows
             }
 
-            [$sql, $bind] = $this->makeLogVisitsQueryString($idSite, $queryRange[0], $queryRange[1], $segment, $updatedOffset, $updatedLimit, $visitorId, $minTimestamp, $filterSortOrder);
+            /*
+             * get the value of the measurable setting for the site, to determine what data to retrieve
+            $settings = new SettingsProvider(\Piwik\Plugin\Manager::getInstance());
+            $measurableSettings = $this->settingsProvider->getAllMeasurableSettings($idSite, $idType);
+             */
+            $settings = new SettingsProvider(\Piwik\Plugin\Manager::getInstance());
+            
+            $siteFlags = array();
+            $anySiteFlagged = false;
+            foreach($idSite as $id) {
+                $measurableSettings = $settings->getAllMeasurableSettings($id, null);
+                $isVisitorLogDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_log')->getValue();
+                $isVisitorProfileDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_profile')->getValue();
 
-            $visits = $this->executeLogVisitsQuery($sql, $bind, $segment, $dateStart, $dateEnd, $minTimestamp, $limit);
+                if ($isVisitorLogDisabled || $isVisitorProfileDisabled) $anySiteFlagged = true;
+                
+                $siteFlags[$id] = $isVisitorProfileDisabled || $isVisitorLogDisabled;
+            }
+
+            if ($anySiteFlagged) {
+                /*
+                 * create a sql query for each site 
+                 * have two functions, the only difference being which columns 
+                 * are retrieved.
+                 *
+                 * concatenate the data.
+                 */
+            } else {
+                /*
+                 * Do the original sql query 
+                 */ 
+                [$sql, $bind] = $this->makeLogVisitsQueryString($idSite, $queryRange[0], $queryRange[1], $segment, $updatedOffset, $updatedLimit, $visitorId, $minTimestamp, $filterSortOrder);
+                $visits = $this->executeLogVisitsQuery($sql, $bind, $segment, $dateStart, $dateEnd, $minTimestamp, $limit);
+            }
+
 
             if (!empty($offset) && empty($visits)) {
                 // find out if there are any matches
@@ -580,6 +613,71 @@ class Model
      * @throws Exception
      */
     public function makeLogVisitsQueryString($idSite, $startDate, $endDate, $segment, $offset, $limit, $visitorId, $minTimestamp, $filterSortOrder)
+    {
+        [$whereClause, $bindIdSites] = $this->getIdSitesWhereClause($idSite);
+
+        [$whereBind, $where] = $this->getWhereClauseAndBind($whereClause, $bindIdSites, $startDate, $endDate, $visitorId, $minTimestamp);
+
+        if (strtolower($filterSortOrder) !== 'asc') {
+            $filterSortOrder = 'DESC';
+        }
+
+        $segment = new Segment($segment, $idSite, $startDate, $endDate);
+
+        // Subquery to use the indexes for ORDER BY
+        $select = "log_visit.*";
+        $from = "log_visit";
+
+        $limit = $limit >= 1 ? (int)$limit : 0;
+        $offset = $offset >= 1 ? (int)$offset : 0;
+
+        $orderBy = '';
+        if (count($bindIdSites) <= 1) {
+            $orderBy = 'log_visit.idsite ' . $filterSortOrder . ', ';
+        }
+
+        $orderBy .= "log_visit.visit_last_action_time " . $filterSortOrder;
+
+        $orderBy .= ", log_visit.idvisit " . $filterSortOrder;
+
+        if ($segment->isEmpty()) {
+            $groupBy = false;
+        } else {
+            // see https://github.com/matomo-org/matomo/issues/13861
+            $groupBy = 'log_visit.idvisit';
+        }
+
+        $innerLimit = $limit;
+
+        $innerQuery = $segment->getSelectQuery($select, $from, $where, $whereBind, $orderBy, $groupBy, $innerLimit, $offset, $forceGroupBy = true);
+
+        $bind = $innerQuery['bind'];
+
+        if (!$visitorId) {
+            // for now let's not apply when looking for a specific visitor
+            $innerQuery['sql'] = DbHelper::addMaxExecutionTimeHintToQuery(
+                $innerQuery['sql'],
+                $this->getLiveQueryMaxExecutionTime()
+            );
+        }
+
+        return array($innerQuery['sql'], $bind);
+    }
+
+    /**
+     * @param $idSite
+     * @param Date $startDate
+     * @param Date $endDate
+     * @param $segment
+     * @param int $offset
+     * @param int $limit
+     * @param $visitorId
+     * @param $minTimestamp
+     * @param $filterSortOrder
+     * @return array
+     * @throws Exception
+     */
+    public function makeLogVisitsQueryStringNoVisitorLog($idSite, $startDate, $endDate, $segment, $offset, $limit, $visitorId, $minTimestamp, $filterSortOrder)
     {
         [$whereClause, $bindIdSites] = $this->getIdSitesWhereClause($idSite);
 
