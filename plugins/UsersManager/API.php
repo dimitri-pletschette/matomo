@@ -1152,11 +1152,15 @@ class API extends \Piwik\Plugin\API
                 $ids = implode(', ', $this->roleProvider->getAllRoleIds());
                 throw new Exception(Piwik::translate('UsersManager_ExceptionMultipleRoleSet', $ids));
             }
+
+            $role = reset($roles);
         } else {
             // as only one access is set, we require it to be a role or "noaccess"...
             if ($access !== 'noaccess') {
                 $this->roleProvider->checkValidRole($access);
             }
+
+            $role = $access;
         }
 
         $this->checkUserExist($userLogin);
@@ -1165,23 +1169,18 @@ class API extends \Piwik\Plugin\API
         // Re-verify admin access for current user is still applicable.
         $this->getIdSitesCheckAdminAccess($idSites);
 
-        if ($access === 'noaccess') {
+        if ($role === 'noaccess') {
             $this->model->deleteUserAccess($userLogin, $idSites);
             // if the access is noaccess then we don't save it as this is the default value
             // when no access are specified
             Piwik::postEvent('UsersManager.removeSiteAccess', [$userLogin, $idSites]);
         } else {
             if (empty($idSitesAndAccess)) {
-                if (is_array($roles) && !empty($roles)) {
-                    $role = array_shift($roles);
-                    $this->model->addUserAccess($userLogin, $role, $idSites);
-                } else {
-                    $this->model->addUserAccess($userLogin, $access, $idSites);
-                }
+                $this->model->addUserAccess($userLogin, $role, $idSites);
             }
 
             foreach ($idSitesAndAccess as $idSite => $previousAccess) {
-                $success = $this->model->updateUserAccessConditionally($userLogin, $idSite, $access, $previousAccess);
+                $success = $this->model->updateUserAccessConditionally($userLogin, $idSite, $role, $previousAccess);
                 if ($success === false) {
                     throw new Exception('Concurrency problem');
                 }
@@ -1193,7 +1192,7 @@ class API extends \Piwik\Plugin\API
         }
 
         // Send notification to all super users if anonymous access is set for a site
-        if ($userLogin === 'anonymous' && $access === 'view') {
+        if ($userLogin === 'anonymous' && $role === 'view') {
             $container = StaticContainer::getContainer();
 
             $siteNames = [];
