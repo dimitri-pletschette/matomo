@@ -99,6 +99,7 @@ describe("EvolutionGraph", function () {
         await page.goto(page.url().replace(/idSite=[^&]*/, "idSite=3") + "&columns=nb_visits");
         await page.click('.annotationView');
         await page.waitForNetworkIdle();
+        await page.mouse.move(-10, -10);
 
         expect(await page.screenshot({ fullPage: true })).to.matchImage('annotations_none');
     });
