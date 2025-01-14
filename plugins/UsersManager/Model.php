@@ -113,11 +113,19 @@ class Model
         return $return;
     }
 
-    public function getAccessForUserForSite(string $userLogin, int $idSite): ?string
+    /**
+     * @param string $userLogin
+     * @param int $idSite
+     *
+     * @return array|null The list of access for the given user login and id site
+     *
+     * @throws \Piwik\Tracker\Db\DbException
+     */
+    public function getAccessForUserForSite(string $userLogin, int $idSite): ?array
     {
         $db = $this->getDb();
 
-        $accessResults = $db->fetchOne(
+        $accessResults = $db->fetchAll(
             "SELECT access FROM " . Common::prefixTable("access") . " WHERE login = ? AND idsite = ?",
             [
                 $userLogin,
@@ -129,7 +137,13 @@ class Model
             return null;
         }
 
-        return (string) $accessResults;
+        $accessList = [];
+
+        foreach ($accessResults as $accessResult) {
+            $accessList[] = $accessResult['access'];
+        }
+
+        return $accessList;
     }
 
     public function getUsersAccessFromSite($idSite)
