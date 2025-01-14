@@ -1097,7 +1097,7 @@ class API extends \Piwik\Plugin\API
      *
      * @param string $userLogin The user login
      * @param string|array $access Access to grant. Must have one of the following value : noaccess, view, write, admin.
-     *                              May also be an array to sent additional capabilities
+     *                              May also be an array to set additional capabilities
      * @param int|array $idSites The array of idSites on which to apply the access level for the user.
      *       If the value is "all" then we apply the access level to all the websites ID for which the current authentificated user has an 'admin' access.
      * @param string $passwordConfirmation password confirmation. only required when setting view access for anonymous user through session auth
@@ -1120,7 +1120,7 @@ class API extends \Piwik\Plugin\API
 
         foreach ($idSites as $siteId) {
             if ($foundAccess = $this->model->getAccessForUserForSite($userLogin, $siteId)) {
-                $idSitesAndAccess[$siteId] = $foundAccess;
+                $idSitesAndAccess[$siteId] = $this->getRoleAndCapabilitiesFromAccess($foundAccess)[0][0];
             }
         }
 
@@ -1176,7 +1176,8 @@ class API extends \Piwik\Plugin\API
         } else {
 
             if (empty($idSitesAndAccess)) {
-                $this->model->addUserAccess($userLogin, $access, $idSites);
+                $role = array_shift($roles);
+                $this->model->addUserAccess($userLogin, $role, $idSites);
             }
 
             foreach ($idSitesAndAccess as $idSite => $previousAccess) {
