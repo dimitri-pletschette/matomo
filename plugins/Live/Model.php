@@ -83,17 +83,17 @@ class Model
             }
 
             $settings = new SettingsProvider(\Piwik\Plugin\Manager::getInstance());
-            
+
             /*
-             * for each site, determine if visitor logs or visitor profiles have 
-             * been disabled. 
+             * for each site, determine if visitor logs or visitor profiles have
+             * been disabled.
              */
             $siteIdsWithVisitorLogsDisabled = array();
             $siteIdsWithVisitorLogsEnabled = array();
             if (!is_array($idSite)) {
                 $idSite = [intval($idSite)];
             }
-            foreach($idSite as $id) {
+            foreach ($idSite as $id) {
                 $measurableSettings = $settings->getAllMeasurableSettings($id, null);
                 $isVisitorLogDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_log')->getValue();
                 $isVisitorProfileDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_profile')->getValue();
@@ -103,7 +103,7 @@ class Model
                 } else {
                     $siteIdsWithVisitorLogsEnabled[] = $id;
                 }
-                
+
                 //$siteFlags[$id] = $isVisitorProfileDisabled || $isVisitorLogDisabled;
             }
 
@@ -127,8 +127,8 @@ class Model
 
             $visits = [];
             if (count($visitsEnabled) > 0 && count($visitsDisabled) > 0) {
-                // both types of visits are present 
-                
+                // both types of visits are present
+
                 $iDisabled = 0;
                 $iEnabled = 0;
 
@@ -154,9 +154,9 @@ class Model
                     $visits += $visitsDisabled;
                 }
                 if (count($visitsEnabled) > 0) {
-                    $visits += $visitsEnabled;  
+                    $visits += $visitsEnabled;
                 }
-            } 
+            }
 
             if (!empty($offset) && empty($visits)) {
                 // find out if there are any matches
