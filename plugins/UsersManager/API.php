@@ -1176,8 +1176,12 @@ class API extends \Piwik\Plugin\API
         } else {
 
             if (empty($idSitesAndAccess)) {
-                $role = array_shift($roles);
-                $this->model->addUserAccess($userLogin, $role, $idSites);
+                if (is_array($roles) && !empty($roles)) {
+                    $role = array_shift($roles);
+                    $this->model->addUserAccess($userLogin, $role, $idSites);
+                } else {
+                    $this->model->addUserAccess($userLogin, $access, $idSites);
+                }
             }
 
             foreach ($idSitesAndAccess as $idSite => $previousAccess) {
