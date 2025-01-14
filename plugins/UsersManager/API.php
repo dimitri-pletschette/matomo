@@ -103,15 +103,14 @@ class API extends \Piwik\Plugin\API
     private static $instance = null;
 
     public function __construct(
-        Model                        $model,
-        UserAccessFilter             $filter,
-        Password                     $password,
-        ?Access                      $access = null,
-        ?Access\RolesProvider        $roleProvider = null,
+        Model $model,
+        UserAccessFilter $filter,
+        Password $password,
+        ?Access $access = null,
+        ?Access\RolesProvider $roleProvider = null,
         ?Access\CapabilitiesProvider $capabilityProvider = null,
-        ?PasswordVerifier            $passwordVerifier = null
-    )
-    {
+        ?PasswordVerifier $passwordVerifier = null
+    ) {
         $this->model = $model;
         $this->userFilter = $filter;
         $this->password = $password;
@@ -130,7 +129,7 @@ class API extends \Piwik\Plugin\API
      *
      * StaticContainer::getContainer()->set('UsersManager_API', \Piwik\Plugins\MyCustomUsersManager\API::getInstance());
      *
-     * @return \Piwik\Plugins\UsersManager\API
+     * @return API
      * @throws Exception
      */
     public static function getInstance()
@@ -379,7 +378,7 @@ class API extends \Piwik\Plugin\API
             if (!Piwik::hasUserSuperUserAccess()) {
                 $adminIdSites = Access::getInstance()->getSitesIdWithAdminAccess();
                 if (empty($adminIdSites)) { // sanity check
-                    throw new \Exception("The current admin user does not have access to any sites.");
+                    throw new Exception("The current admin user does not have access to any sites.");
                 }
 
                 $loginsToLimit = $this->model->getUsersWithAccessToSites($adminIdSites);
@@ -441,7 +440,7 @@ class API extends \Piwik\Plugin\API
         Piwik::checkUserHasSomeAdminAccess();
 
         if (!is_string($userLogins)) {
-            throw new \Exception('Parameter userLogins needs to be a string containing a comma separated list of users');
+            throw new Exception('Parameter userLogins needs to be a string containing a comma separated list of users');
         }
 
         $logins = [];
@@ -638,20 +637,19 @@ class API extends \Piwik\Plugin\API
         $offset = 0,
         $filter_search = null,
         $filter_access = null
-    )
-    {
+    ) {
         Piwik::checkUserHasSomeAdminAccess();
         $this->checkUserExists($userLogin);
 
         if (Piwik::hasTheUserSuperUserAccess($userLogin)) {
-            throw new \Exception("This method should not be used with superusers.");
+            throw new Exception("This method should not be used with superusers.");
         }
 
         $idSites = null;
         if (!Piwik::hasUserSuperUserAccess()) {
             $idSites = $this->access->getSitesIdWithAdminAccess();
             if (empty($idSites)) { // sanity check
-                throw new \Exception("The current admin user does not have access to any sites.");
+                throw new Exception("The current admin user does not have access to any sites.");
             }
         }
 
@@ -757,7 +755,7 @@ class API extends \Piwik\Plugin\API
 
         if (!Piwik::hasUserSuperUserAccess()) {
             if (empty($initialIdSite)) {
-                throw new \Exception(Piwik::translate("UsersManager_AddUserNoInitialAccessError"));
+                throw new Exception(Piwik::translate("UsersManager_AddUserNoInitialAccessError"));
             }
         }
 
@@ -797,7 +795,7 @@ class API extends \Piwik\Plugin\API
         }
 
         if (empty($initialIdSite)) {
-            throw new \Exception(Piwik::translate("UsersManager_AddUserNoInitialAccessError"));
+            throw new Exception(Piwik::translate("UsersManager_AddUserNoInitialAccessError"));
         } else {
             // check if the site exists
             new Site($initialIdSite);
@@ -823,7 +821,7 @@ class API extends \Piwik\Plugin\API
      *                                     access.
      * @param string $passwordConfirmation the current user's password. For security purposes, this value should be
      *                                     sent as a POST parameter.
-     * @throws \Exception
+     * @throws Exception
      */
     public function setSuperUserAccess($userLogin, $hasSuperUserAccess, $passwordConfirmation = null)
     {
@@ -898,8 +896,7 @@ class API extends \Piwik\Plugin\API
         $email = false,
         $_isPasswordHashed = false,
         $passwordConfirmation = false
-    )
-    {
+    ) {
         $email = Common::unsanitizeInputValue($email);
         $requirePasswordConfirmation = self::$UPDATE_USER_REQUIRE_PASSWORD_CONFIRMATION;
         self::$UPDATE_USER_REQUIRE_PASSWORD_CONFIRMATION = true;
@@ -1174,7 +1171,6 @@ class API extends \Piwik\Plugin\API
             // when no access are specified
             Piwik::postEvent('UsersManager.removeSiteAccess', [$userLogin, $idSites]);
         } else {
-
             if (empty($idSitesAndAccess)) {
                 if (is_array($roles) && !empty($roles)) {
                     $role = array_shift($roles);
@@ -1456,8 +1452,7 @@ class API extends \Piwik\Plugin\API
         $description,
         $expireDate = null,
         $expireHours = 0
-    )
-    {
+    ) {
         $user = $this->model->getUser($userLogin);
         if (empty($user) && Piwik::isValidEmailString($userLogin)) {
             $user = $this->model->getUserByEmail($userLogin);
@@ -1475,7 +1470,7 @@ class API extends \Piwik\Plugin\API
                 Piwik::postEvent('Login.authenticate.failed', [$userLogin]);
             }
 
-            throw new \Exception(Piwik::translate('UsersManager_CurrentPasswordNotCorrect'));
+            throw new Exception(Piwik::translate('UsersManager_CurrentPasswordNotCorrect'));
         }
 
         if (empty($expireDate) && !empty($expireHours) && is_numeric($expireHours)) {
