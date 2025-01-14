@@ -82,41 +82,81 @@ class Model
                 $updatedOffset = 0; // we've already skipped enough rows
             }
 
-            /*
-             * get the value of the measurable setting for the site, to determine what data to retrieve
-            $settings = new SettingsProvider(\Piwik\Plugin\Manager::getInstance());
-            $measurableSettings = $this->settingsProvider->getAllMeasurableSettings($idSite, $idType);
-             */
             $settings = new SettingsProvider(\Piwik\Plugin\Manager::getInstance());
             
-            $siteFlags = array();
-            $anySiteFlagged = false;
+            /*
+             * for each site, determine if visitor logs or visitor profiles have 
+             * been disabled. 
+             */
+            $siteIdsWithVisitorLogsDisabled = array();
+            $siteIdsWithVisitorLogsEnabled = array();
+            if (!is_array($idSite)) {
+                $idSite = [intval($idSite)];
+            }
             foreach($idSite as $id) {
                 $measurableSettings = $settings->getAllMeasurableSettings($id, null);
                 $isVisitorLogDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_log')->getValue();
                 $isVisitorProfileDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_profile')->getValue();
 
-                if ($isVisitorLogDisabled || $isVisitorProfileDisabled) $anySiteFlagged = true;
+                if ($isVisitorLogDisabled || $isVisitorProfileDisabled) {
+                    $siteIdsWithVisitorLogsDisabled[] = $id;
+                } else {
+                    $siteIdsWithVisitorLogsEnabled[] = $id;
+                }
                 
-                $siteFlags[$id] = $isVisitorProfileDisabled || $isVisitorLogDisabled;
+                //$siteFlags[$id] = $isVisitorProfileDisabled || $isVisitorLogDisabled;
             }
 
-            if ($anySiteFlagged) {
-                /*
-                 * create a sql query for each site 
-                 * have two functions, the only difference being which columns 
-                 * are retrieved.
-                 *
-                 * concatenate the data.
-                 */
+            $visitsDisabled = [];
+            $visitsEnabled = [];
+
+            if (count($siteIdsWithVisitorLogsDisabled) > 0) {
+                try {
+                    [$sql, $bind] = $this->makeLogVisitsQueryStringNoVisitorLog($siteIdsWithVisitorLogsDisabled, $queryRange[0], $queryRange[1], $segment, $updatedOffset, $updatedLimit, $visitorId, $minTimestamp, $filterSortOrder);
+                    $visitsDisabled = $this->executeLogVisitsQuery($sql, $bind, $segment, $dateStart, $dateEnd, $minTimestamp, $limit);
+                } catch (Exception $e) {
+
+                    $a = 1;
+                    // do nothing for now, in the future add some sort of message
+                }
+            }
+            if (count($siteIdsWithVisitorLogsEnabled) > 0) {
+                [$sql, $bind] = $this->makeLogVisitsQueryString($siteIdsWithVisitorLogsEnabled, $queryRange[0], $queryRange[1], $segment, $updatedOffset, $updatedLimit, $visitorId, $minTimestamp, $filterSortOrder);
+                $visitsEnabled = $this->executeLogVisitsQuery($sql, $bind, $segment, $dateStart, $dateEnd, $minTimestamp, $limit);
+            }
+
+            $visits = [];
+            if (count($visitsEnabled) > 0 && count($visitsDisabled) > 0) {
+                // both types of visits are present 
+                
+                $iDisabled = 0;
+                $iEnabled = 0;
+
+                while ($iDisabled < count($visitsDisabled) && $iEnabled < count($visitsEnabled)) {
+                    if (strtotime($visitsDisabled[$iDisabled]["visit_last_action_time"]) >= strtotime($visitsEnabled[$iEnabled]["visit_last_action_time"])) {
+                        $visits[] = $visitsDisabled[$iDisabled];
+                        $iDisabled++;
+                    } else {
+                        $visits[] = $visitsEnabled[$iEnabled];
+                        $iEnabled++;
+                    }
+                }
+
+                if ($iDisabled < count($visitsDisabled)) {
+                    $visits += array_slice($visitsDisabled, $iDisabled);
+                }
+
+                if ($iEnabled < count($visitsEnabled)) {
+                    $visits += array_slice($visitsEnabled, $iEnabled);
+                }
             } else {
-                /*
-                 * Do the original sql query 
-                 */ 
-                [$sql, $bind] = $this->makeLogVisitsQueryString($idSite, $queryRange[0], $queryRange[1], $segment, $updatedOffset, $updatedLimit, $visitorId, $minTimestamp, $filterSortOrder);
-                $visits = $this->executeLogVisitsQuery($sql, $bind, $segment, $dateStart, $dateEnd, $minTimestamp, $limit);
-            }
-
+                if (count($visitsDisabled) > 0) {
+                    $visits += $visitsDisabled;
+                }
+                if (count($visitsEnabled) > 0) {
+                    $visits += $visitsEnabled;  
+                }
+            } 
 
             if (!empty($offset) && empty($visits)) {
                 // find out if there are any matches
@@ -690,7 +730,64 @@ class Model
         $segment = new Segment($segment, $idSite, $startDate, $endDate);
 
         // Subquery to use the indexes for ORDER BY
-        $select = "log_visit.*";
+        $select = "idvisit,
+            idsite,
+            visit_last_action_time,
+            config_id,
+            profilable,
+            visit_first_action_time,
+            visit_goal_buyer,
+            visit_goal_converted,
+            visitor_returning,
+            visitor_seconds_since_first,
+            visitor_seconds_since_order,
+            visitor_count_visits,
+            visit_entry_idaction_name,
+            visit_entry_idaction_url,
+            visit_exit_idaction_name,
+            visit_exit_idaction_url,
+            visit_total_actions,
+            visit_total_interactions,
+            visit_total_searches,
+            referer_keyword,
+            referer_name,
+            referer_type,
+            referer_url,
+            location_browser_lang,
+            config_browser_engine,
+            config_browser_name,
+            config_browser_version,
+            config_client_type,
+            config_device_brand,
+            config_device_model,
+            config_device_type,
+            config_os,
+            config_os_version,
+            visit_total_events,
+            visitor_localtime,
+            visitor_seconds_since_last,
+            config_resolution,
+            config_cookie,
+            config_flash,
+            config_java,
+            config_pdf,
+            config_quicktime,
+            config_realplayer,
+            config_silverlight,
+            config_windowsmedia,
+            visit_total_time,
+            location_city,
+            location_country,
+            location_latitude,
+            location_longitude,
+            location_region,
+            last_idlink_va,
+            custom_dimension_1,
+            custom_dimension_2,
+            custom_dimension_3,
+            custom_dimension_4,
+            custom_dimension_5";
+        //$select = "log_visit.idvisit, log_visit.idsite, log_visit.visit_last_action_time, log_visit.visit_first_action_time";
         $from = "log_visit";
 
         $limit = $limit >= 1 ? (int)$limit : 0;
