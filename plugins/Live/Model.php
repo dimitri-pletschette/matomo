@@ -109,16 +109,16 @@ class Model
             $visitsEnabled = [];
 
             /*
-             * for both sites with visitor logs/profiles enabled and disabled, retrieve 
+             * for both sites with visitor logs/profiles enabled and disabled, retrieve
              * the relevant data from the database.
              *
              * sites with visitor logs/profiles disabled only return a subset of
-             * the columns that are returned for sites with logs enabled, in 
-             * order to remove any PII. 
+             * the columns that are returned for sites with logs enabled, in
+             * order to remove any PII.
              *
              * sites with logs disabled have a more limited list of available
              * segments, and so are able to fail when that segment is retrieved.
-             * In that scenario the data is considered not retrievable and so 
+             * In that scenario the data is considered not retrievable and so
              * the exception is caught silently.
              */
             if (count($siteIdsWithVisitorLogsDisabled) > 0) {
@@ -135,11 +135,11 @@ class Model
             }
 
             /*
-             * the data from both sites with visitor logs disabled and enabled 
-             * is merged into a single visits[] array. 
+             * the data from both sites with visitor logs disabled and enabled
+             * is merged into a single visits[] array.
              *
              * The data is sorted via the visit_last_action_time column.
-             * if either the sites with logs disabled or enabled returns no 
+             * if either the sites with logs disabled or enabled returns no
              * data, then no sorting needs to occur.
              */
             $visits = [];
