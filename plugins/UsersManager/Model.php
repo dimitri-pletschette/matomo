@@ -840,7 +840,7 @@ class Model
         $db = $this->getDb();
 
         if (is_null($idSites)) {
-            $db->query("DELETE FROM " . Common::prefixTable("access") . " WHERE login = ? AND access != ?", $userLogin, $accessToExcludeFromDeletion);
+            $db->query("DELETE FROM " . Common::prefixTable("access") . " WHERE login = ? AND access != ?", [$userLogin, $accessToExcludeFromDeletion]);
         } else {
             foreach ($idSites as $idsite) {
                 $db->query(

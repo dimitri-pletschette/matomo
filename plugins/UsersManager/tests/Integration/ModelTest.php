@@ -384,4 +384,44 @@ class ModelTest extends IntegrationTestCase
         $this->assertEquals($id5, $tokens[1]['idusertokenauth']);
         $this->assertCount(2, $tokens);
     }
+
+    public function testDeleteUserAccessExcludingWhenIdSitesNull(): void
+    {
+        $this->model->addUserAccess($this->login, 'role', [1, 2]);
+        $this->model->addUserAccess($this->login, 'capability_1', [1, 2]);
+        $this->model->addUserAccess($this->login, 'capability_2', [1, 2]);
+        $this->model->addUserAccess($this->login, 'capability_3', [1, 2]);
+
+        $this->model->deleteUserAccessExcluding($this->login, 'role', null);
+
+        $this->assertEquals(
+            ['role'],
+            $this->model->getAccessForUserForSite($this->login, 1)
+        );
+
+        $this->assertEquals(
+            ['role'],
+            $this->model->getAccessForUserForSite($this->login, 2)
+        );
+    }
+
+    public function testDeleteUserAccessExcludingWhenIdSitesNotNull(): void
+    {
+        $this->model->addUserAccess($this->login, 'role', [1, 2]);
+        $this->model->addUserAccess($this->login, 'capability_1', [1, 2]);
+        $this->model->addUserAccess($this->login, 'capability_2', [1, 2]);
+        $this->model->addUserAccess($this->login, 'capability_3', [1, 2]);
+
+        $this->model->deleteUserAccessExcluding($this->login, 'role', [1]);
+
+        $this->assertEquals(
+            ['role'],
+            $this->model->getAccessForUserForSite($this->login, 1)
+        );
+
+        $this->assertEquals(
+            ['role', 'capability_1', 'capability_2', 'capability_3'],
+            $this->model->getAccessForUserForSite($this->login, 2)
+        );
+    }
 }
