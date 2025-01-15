@@ -835,6 +835,22 @@ class Model
         }
     }
 
+    public function deleteUserAccessExcluding(string $userLogin, string $accessToExcludeFromDeletion, array $idSites = null): void
+    {
+        $db = $this->getDb();
+
+        if (is_null($idSites)) {
+            $db->query("DELETE FROM " . Common::prefixTable("access") . " WHERE login = ? AND access != ?", $userLogin, $accessToExcludeFromDeletion);
+        } else {
+            foreach ($idSites as $idsite) {
+                $db->query(
+                    "DELETE FROM " . Common::prefixTable("access") . " WHERE idsite = ? AND login = ? AND access != ?",
+                    [$idsite, $userLogin, $accessToExcludeFromDeletion]
+                );
+            }
+        }
+    }
+
     private function getDb()
     {
         return Db::get();

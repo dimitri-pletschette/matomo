@@ -1187,6 +1187,8 @@ class API extends \Piwik\Plugin\API
             }
         }
 
+        $this->model->deleteUserAccessExcluding($userLogin, $role, $idSites);
+
         if (!empty($capabilities)) {
             $this->addCapabilities($userLogin, $capabilities, $idSites);
         }
