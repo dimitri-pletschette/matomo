@@ -730,6 +730,10 @@ class Model
         $segment = new Segment($segment, $idSite, $startDate, $endDate);
 
         // Subquery to use the indexes for ORDER BY
+        /*
+         * In order to remove PII from being retrieved, specific columns are
+         * not included in this query.
+         */
         $select = "idvisit,
             idsite,
             visit_last_action_time,
