@@ -88,8 +88,8 @@ class Model
              * for each site, determine if visitor logs or visitor profiles have
              * been disabled.
              */
-            $siteIdsWithVisitorLogsDisabled = array();
-            $siteIdsWithVisitorLogsEnabled = array();
+            $siteIdsWithVisitorLogsDisabled = [];
+            $siteIdsWithVisitorLogsEnabled = [];
             if (!is_array($idSite)) {
                 $idSite = [intval($idSite)];
             }
@@ -115,8 +115,6 @@ class Model
                     [$sql, $bind] = $this->makeLogVisitsQueryStringNoVisitorLog($siteIdsWithVisitorLogsDisabled, $queryRange[0], $queryRange[1], $segment, $updatedOffset, $updatedLimit, $visitorId, $minTimestamp, $filterSortOrder);
                     $visitsDisabled = $this->executeLogVisitsQuery($sql, $bind, $segment, $dateStart, $dateEnd, $minTimestamp, $limit);
                 } catch (Exception $e) {
-
-                    $a = 1;
                     // do nothing for now, in the future add some sort of message
                 }
             }
