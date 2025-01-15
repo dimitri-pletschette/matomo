@@ -156,6 +156,7 @@
               <span
                 :title="`${dataSubject.deviceType} ${dataSubject.deviceModel}`"
                 style="margin-right:3.5px"
+                v-show="dataSubject.deviceType != 'Unknown'"
               >
                 <img
                   height="16"
@@ -165,6 +166,7 @@
               <span
                 :title="dataSubject.operatingSystem"
                 style="margin-right:3.5px"
+                v-show="dataSubject.operatingSystem != 'Unknown'"
               >
                 <img
                   height="16"
@@ -174,6 +176,7 @@
               <span
                 :title="`${dataSubject.browser} ${dataSubject.browserFamilyDescription}`"
                 style="margin-right:3.5px"
+                v-show="dataSubject.browser != 'Unknown'"
               >
                 <img
                   height="16"
@@ -182,6 +185,7 @@
               </span>
               <span
                 :title="`${dataSubject.country} ${dataSubject.region || ''}`"
+                v-show="dataSubject.country != 'Unknown'"
               >
                 <img
                   height="16"
@@ -194,6 +198,7 @@
                 class="visitorLogTooltip"
                 title="View visitor profile"
                 @click="showProfile(dataSubject.visitorId, dataSubject.idSite)"
+                v-show="dataSubject.visitorId"
               >
                 <img src="plugins/Live/images/visitorProfileLaunch.png" style="margin-right:3.5px"/>
                 <span>{{ translate('Live_ViewVisitorProfile') }}</span>
