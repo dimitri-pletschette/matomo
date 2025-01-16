@@ -42,17 +42,15 @@ class FeatureFlagManager
             return false;
         }
 
-        $featureActive = false;
-
         foreach ($this->storages as $storage) {
             $isActive = $storage->isFeatureActive($featureFlagObj);
 
             if ($isActive !== null) {
-                $featureActive = $isActive;
+                return $isActive;
             }
         }
 
-        return $featureActive;
+        return false;
     }
 
     private function createFeatureFlagObjFromString(string $featureFlag): ?FeatureFlagInterface

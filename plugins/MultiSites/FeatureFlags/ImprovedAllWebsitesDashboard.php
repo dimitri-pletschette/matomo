@@ -19,4 +19,9 @@ class ImprovedAllWebsitesDashboard implements FeatureFlagInterface
     {
         return 'ImprovedAllWebsitesDashboard';
     }
+
+    public function allowsCookieOverwrite(): bool
+    {
+        return true;
+    }
 }
