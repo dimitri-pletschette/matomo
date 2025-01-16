@@ -20,6 +20,10 @@
         >
         </span>
       </EnrichedHeadline>
+      <FeatureFlagToggle
+        description="Switch to new Layout"
+        feature-name="ImprovedAllWebsitesDashboard"
+      ></FeatureFlagToggle>
     </h2>
     <table
       id="mt"
@@ -291,6 +295,7 @@ import {
   externalRawLink,
   NumberFormatter,
 } from 'CoreHome';
+import { FeatureFlagToggle } from 'FeatureFlags';
 import MultisitesSite from '../MultisitesSite/MultisitesSite.vue';
 import DashboardStore from './Dashboard.store';
 
@@ -308,6 +313,7 @@ export default defineComponent({
     autoRefreshTodayReport: Number,
   },
   components: {
+    FeatureFlagToggle,
     EnrichedHeadline,
     ActivityIndicator,
     MultisitesSite,
