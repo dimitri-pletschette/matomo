@@ -13,6 +13,7 @@ use Piwik\API\Request;
 use Piwik\Container\StaticContainer;
 use Piwik\Piwik;
 use Piwik\Config as PiwikConfig;
+use Piwik\Plugin\SettingsProvider;
 use Piwik\Plugins\PrivacyManager\Model\DataSubjects;
 use Piwik\Plugins\PrivacyManager\Dao\LogDataAnonymizer;
 use Piwik\Plugins\PrivacyManager\Model\LogDataAnonymizations;
@@ -122,9 +123,49 @@ class API extends \Piwik\Plugin\API
             'countryFlag',
         ];
 
+        $GDPRColumnsToKeep = [
+            'lastActionDateTime',
+            'idVisit',
+            'idSite',
+            'siteName',
+        ];
+
+        $settings = new SettingsProvider(\Piwik\Plugin\Manager::getInstance());
+
+        /*
+        * for each site, determine if visitor logs or visitor profiles have
+        * been disabled.
+        */
+        $siteIds = Site::getIdSitesFromIdSitesString($idSite);
+        $siteIdsWithVisitorLogsDisabled = [];
+        if (!is_array($siteIds)) {
+            $siteIds = [intval($siteIds)];
+        }
+        foreach ($siteIds as $id) {
+            $measurableSettings = $settings->getAllMeasurableSettings($id, null);
+            $isVisitorLogDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_log')->getValue();
+            $isVisitorProfileDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_profile')->getValue();
+
+            if ($isVisitorLogDisabled || $isVisitorProfileDisabled) {
+                $siteIdsWithVisitorLogsDisabled[] = $id;
+            }
+        }
+
         foreach ($result->getColumns() as $column) {
             if (!in_array($column, $columnsToKeep)) {
                 $result->deleteColumn($column);
+            }
+        }
+
+        if (count($siteIdsWithVisitorLogsDisabled) > 0) {
+            foreach ($result->getRowsWithoutSummaryRow() as $row) {
+                if (in_array($row->getColumn('idSite'), $siteIdsWithVisitorLogsDisabled)) {
+                    foreach (array_keys($row->getColumns()) as $column) {
+                        if (!in_array($column, $GDPRColumnsToKeep)) {
+                            $row->deleteColumn($column);
+                        }
+                    }
+                }
             }
         }
 
