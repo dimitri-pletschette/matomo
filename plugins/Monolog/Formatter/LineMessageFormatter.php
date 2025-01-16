@@ -53,6 +53,8 @@ class LineMessageFormatter implements FormatterInterface
         $total = '';
 
         foreach ($messages as $message) {
+            // escape control characters
+            $message = addcslashes($message, "\x00..\x1F\x7F");
             $message = $this->prefixMessageWithRequestId($record, $message);
             $total  .= $this->formatMessage($class, $message, $date, $record);
         }
