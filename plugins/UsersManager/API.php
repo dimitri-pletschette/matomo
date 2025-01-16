@@ -1113,15 +1113,6 @@ class API extends \Piwik\Plugin\API
 
         $idSites = $this->getIdSitesCheckAdminAccess($idSites);
 
-        // Get current permissions per ID site
-        $idSitesAndAccess = [];
-
-        foreach ($idSites as $siteId) {
-            if ($foundAccess = $this->model->getAccessForUserForSite($userLogin, $siteId)) {
-                $idSitesAndAccess[$siteId] = $this->getRoleAndCapabilitiesFromAccess($foundAccess)[0][0];
-            }
-        }
-
         // check password confirmation only when using session auth and setting view access for anonymous user
         if ($userLogin === 'anonymous' && Request::fromRequest()->getBoolParameter('force_api_session', false) && $access === 'view') {
             $this->confirmCurrentUserPassword($passwordConfirmation);
@@ -1166,6 +1157,16 @@ class API extends \Piwik\Plugin\API
 
         $this->checkUserExist($userLogin);
         $this->checkUsersHasNotSuperUserAccess($userLogin);
+
+
+        // Get current roles per ID site
+        $idSitesAndAccess = [];
+
+        foreach ($idSites as $siteId) {
+            if ($foundAccess = $this->model->getAccessForUserForSite($userLogin, $siteId)) {
+                $idSitesAndAccess[$siteId] = $this->getRoleAndCapabilitiesFromAccess($foundAccess)[0][0];
+            }
+        }
 
         // Re-verify admin access for current user is still applicable.
         $this->getIdSitesCheckAdminAccess($idSites);
