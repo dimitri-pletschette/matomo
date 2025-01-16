@@ -19,6 +19,7 @@ use Piwik\Common;
 use Piwik\Config;
 use Piwik\Container\StaticContainer;
 use Piwik\Date;
+use Piwik\Log\LoggerInterface;
 use Piwik\NoAccessException;
 use Piwik\Option;
 use Piwik\Piwik;
@@ -1182,6 +1183,7 @@ class API extends \Piwik\Plugin\API
             foreach ($idSitesAndAccess as $idSite => $previousAccess) {
                 $success = $this->model->updateUserAccessConditionally($userLogin, $idSite, $role, $previousAccess);
                 if ($success === false) {
+                    StaticContainer::get(LoggerInterface::class)->error('---- Concurrency problem ----');
                     throw new Exception('Concurrency problem');
                 }
             }
