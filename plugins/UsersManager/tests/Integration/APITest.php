@@ -1176,24 +1176,27 @@ class APITest extends IntegrationTestCase
 
     public function testSetUserAccessHandlesMultipleSitesWithMultiCurrentStateOfAccess()
     {
-        $this->api->setUserAccess($this->login, [View::ID], [1]);
-        $this->api->setUserAccess($this->login, [View::ID], [1, 2]);
+        $this->api->setUserAccess($this->login, [View::ID, TestCap1::ID], [1]);
+        $this->api->setUserAccess($this->login, [Admin::ID], [1, 2]);
 
         $access = $this->model->getSitesAccessFromUser($this->login);
-        self::assertEquals([['site' => '1', 'access' => 'view'], ['site' => '2', 'access' => 'view']], $access);
+        self::assertEquals([['site' => '1', 'access' => 'admin'], ['site' => '2', 'access' => 'admin']], $access);
     }
 
     public function testSetUserAccessHandlesMultipleSitesWithMultiCurrentStateOfAccessAndCapabilities()
     {
-        $this->api->setUserAccess($this->login, [View::ID, TestCap1::ID, TestCap2::ID], [1]);
-        $this->api->setUserAccess($this->login, [View::ID, TestCap3::ID], [1, 2]);
+        $this->api->setUserAccess($this->login, [View::ID, TestCap1::ID, TestCap2::ID], [1, 3]);
+        $this->api->setUserAccess($this->login, [Write::ID, TestCap3::ID], [1, 2]);
 
         $access = $this->model->getSitesAccessFromUser($this->login);
         self::assertEquals([
-            ['site' => '1', 'access' => 'view'],
+            ['site' => '1', 'access' => 'write'],
             ['site' => '1', 'access' => 'test_cap3'],
-            ['site' => '2', 'access' => 'view'],
-            ['site' => '2', 'access' => 'test_cap3']
+            ['site' => '2', 'access' => 'write'],
+            ['site' => '2', 'access' => 'test_cap3'],
+            ['site' => '3', 'access' => 'view'],
+            ['site' => '3', 'access' => 'test_cap1'],
+            ['site' => '3', 'access' => 'test_cap2'],
         ], $access);
     }
 
