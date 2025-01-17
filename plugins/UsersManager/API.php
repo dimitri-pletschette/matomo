@@ -19,7 +19,6 @@ use Piwik\Common;
 use Piwik\Config;
 use Piwik\Container\StaticContainer;
 use Piwik\Date;
-use Piwik\Log\LoggerInterface;
 use Piwik\NoAccessException;
 use Piwik\Option;
 use Piwik\Piwik;
