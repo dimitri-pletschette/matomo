@@ -137,13 +137,7 @@ class Model
             return null;
         }
 
-        $accessList = [];
-
-        foreach ($accessResults as $accessResult) {
-            $accessList[] = $accessResult['access'];
-        }
-
-        return $accessList;
+        return array_column($accessResults, 'access');
     }
 
     public function getUsersAccessFromSite($idSite)
