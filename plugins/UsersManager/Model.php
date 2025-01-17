@@ -777,7 +777,7 @@ class Model
               AND access = ?
         ";
 
-        if ($db->fetchOne($selectSql, [$userLogin, $idSite, $newAccess]) === 0) {
+        if ((int) $db->fetchOne($selectSql, [$userLogin, $idSite, $newAccess]) === 0) {
             return false;
         }
 
