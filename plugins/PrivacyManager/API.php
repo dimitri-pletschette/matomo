@@ -18,6 +18,7 @@ use Piwik\Plugins\PrivacyManager\Model\DataSubjects;
 use Piwik\Plugins\PrivacyManager\Dao\LogDataAnonymizer;
 use Piwik\Plugins\PrivacyManager\Model\LogDataAnonymizations;
 use Piwik\Plugins\PrivacyManager\Validators\VisitsDataSubject;
+use Piwik\Plugins\TagManager\Model\Tag;
 use Piwik\Site;
 use Piwik\Validators\BaseValidator;
 
@@ -132,22 +133,21 @@ class API extends \Piwik\Plugin\API
 
         $settings = new SettingsProvider(\Piwik\Plugin\Manager::getInstance());
 
-        /*
-        * for each site, determine if visitor logs or visitor profiles have
-        * been disabled.
-        */
         $siteIds = Site::getIdSitesFromIdSitesString($idSite);
-        $siteIdsWithVisitorLogsDisabled = [];
-        if (!is_array($siteIds)) {
-            $siteIds = [intval($siteIds)];
-        }
-        foreach ($siteIds as $id) {
-            $measurableSettings = $settings->getAllMeasurableSettings($id, null);
-            $isVisitorLogDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_log')->getValue();
-            $isVisitorProfileDisabled = $measurableSettings["Live"]->getSetting('disable_visitor_profile')->getValue();
+        $siteIdsWithVisitorLogsOrProfilesDisabled = [];
+        foreach ($siteIds as $siteId) {
+            $measurableSettings = $settings->getAllMeasurableSettings($siteId, null);
+            if (!$measurableSettings["Live"]) {
+                continue;
+            }
+            $disableVisitorLogSetting = $measurableSettings["Live"]->getSetting('disable_visitor_log');
+            $disableVisitorProfileSetting = $measurableSettings["Live"]->getSetting('disable_visitor_profile');
+            
+            $isVisitorLogDisabled = ($disableVisitorLogSetting && $disableVisitorLogSetting->getValue());
+            $isVisitorProfileDisabled = ($disableVisitorProfileSetting && $disableVisitorProfileSetting->getValue());
 
             if ($isVisitorLogDisabled || $isVisitorProfileDisabled) {
-                $siteIdsWithVisitorLogsDisabled[] = $id;
+                $siteIdsWithVisitorLogsOrProfilesDisabled[] = $siteId;
             }
         }
 
@@ -157,12 +157,23 @@ class API extends \Piwik\Plugin\API
             }
         }
 
-        if (count($siteIdsWithVisitorLogsDisabled) > 0) {
-            foreach ($result->getRowsWithoutSummaryRow() as $row) {
-                if (in_array($row->getColumn('idSite'), $siteIdsWithVisitorLogsDisabled)) {
-                    foreach (array_keys($row->getColumns()) as $column) {
-                        if (!in_array($column, $GDPRColumnsToKeep)) {
-                            $row->deleteColumn($column);
+        /*
+         * If there are any sites detected that have visitor logs or visitor
+         * profiles disabled, then filter rows associated with those sites.
+         *
+         * For rows which whose site Id match a site with disabled visitor logs
+         * or profiles, all columns for said row, except those defined in 
+         * $GDPRColumnsToKeep, are removed.
+         */
+        if (count($siteIdsWithVisitorLogsOrProfilesDisabled) > 0) {
+            $resultDataInRows = $result->getRowsWithoutSummaryRow();
+            foreach ($resultDataInRows as $row) {
+                $siteIdOfCurrentRow = $row->getColumn('idSite');
+                if (in_array($siteIdOfCurrentRow, $siteIdsWithVisitorLogsOrProfilesDisabled)) {
+                    $columnNames = array_keys($row->getColumns());
+                    foreach ($columnNames as $columnName) {
+                        if (!in_array($columnName, $GDPRColumnsToKeep)) {
+                            $row->deleteColumn($columnName);
                         }
                     }
                 }
