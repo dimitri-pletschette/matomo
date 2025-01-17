@@ -1174,6 +1174,29 @@ class APITest extends IntegrationTestCase
         self::assertEquals([['site' => '1', 'access' => 'view']], $access);
     }
 
+    public function testSetUserAccessHandlesMultipleSitesWithMultiCurrentStateOfAccess()
+    {
+        $this->api->setUserAccess($this->login, [View::ID], [1]);
+        $this->api->setUserAccess($this->login, [View::ID], [1, 2]);
+
+        $access = $this->model->getSitesAccessFromUser($this->login);
+        self::assertEquals([['site' => '1', 'access' => 'view'], ['site' => '2', 'access' => 'view']], $access);
+    }
+
+    public function testSetUserAccessHandlesMultipleSitesWithMultiCurrentStateOfAccessAndCapabilities()
+    {
+        $this->api->setUserAccess($this->login, [View::ID, TestCap1::ID, TestCap2::ID], [1]);
+        $this->api->setUserAccess($this->login, [View::ID, TestCap3::ID], [1, 2]);
+
+        $access = $this->model->getSitesAccessFromUser($this->login);
+        self::assertEquals([
+            ['site' => '1', 'access' => 'view'],
+            ['site' => '1', 'access' => 'test_cap3'],
+            ['site' => '2', 'access' => 'view'],
+            ['site' => '2', 'access' => 'test_cap3']
+        ], $access);
+    }
+
     public function testAddCapabilitiesFailsWhenNotCapabilityIsGivenAsString()
     {
         $this->expectException(\Exception::class);
