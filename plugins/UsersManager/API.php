@@ -1177,15 +1177,15 @@ class API extends \Piwik\Plugin\API
             // when no access are specified
             Piwik::postEvent('UsersManager.removeSiteAccess', [$userLogin, $idSites]);
         } else {
-            if (empty($idSitesAndAccess)) {
-                $this->model->addUserAccess($userLogin, $role, $idSites);
-            }
-
-            foreach ($idSitesAndAccess as $idSite => $previousAccess) {
-                $success = $this->model->updateUserAccessConditionally($userLogin, $idSite, $role, $previousAccess);
-                if ($success === false) {
-                    StaticContainer::get(LoggerInterface::class)->error('---- Concurrency problem ----');
-                    throw new Exception('Concurrency problem');
+            foreach ($idSites as $idSite) {
+                if (empty($idSitesAndAccess[$idSite])) {
+                    $this->model->addUserAccess($userLogin, $role, [$idSite]);
+                } else {
+                    $success = $this->model->updateUserAccessConditionally($userLogin, $idSite, $role, $idSitesAndAccess[$idSite]);
+                    if ($success === false) {
+                        StaticContainer::get(LoggerInterface::class)->error('---- Concurrency problem ----');
+                        throw new Exception('Concurrency problem');
+                    }
                 }
             }
             $this->model->deleteUserAccessExcluding($userLogin, $role, $idSites);
