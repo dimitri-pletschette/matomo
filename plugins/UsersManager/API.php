@@ -1183,7 +1183,6 @@ class API extends \Piwik\Plugin\API
                 } else {
                     $success = $this->model->updateUserAccessConditionally($userLogin, $idSite, $role, $idSitesAndAccess[$idSite]);
                     if ($success === false) {
-                        StaticContainer::get(LoggerInterface::class)->error('---- Concurrency problem ----');
                         throw new Exception('Concurrency problem');
                     }
                 }
