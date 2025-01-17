@@ -1188,12 +1188,11 @@ class API extends \Piwik\Plugin\API
                     throw new Exception('Concurrency problem');
                 }
             }
-        }
+            $this->model->deleteUserAccessExcluding($userLogin, $role, $idSites);
 
-        $this->model->deleteUserAccessExcluding($userLogin, $role, $idSites);
-
-        if (!empty($capabilities)) {
-            $this->addCapabilities($userLogin, $capabilities, $idSites);
+            if (!empty($capabilities)) {
+                $this->addCapabilities($userLogin, $capabilities, $idSites);
+            }
         }
 
         // Send notification to all super users if anonymous access is set for a site
