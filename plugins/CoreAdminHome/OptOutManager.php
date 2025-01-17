@@ -18,6 +18,7 @@ use Piwik\Plugins\PrivacyManager\DoNotTrackHeaderChecker;
 use Piwik\Request;
 use Piwik\Tracker\IgnoreCookie;
 use Piwik\Url;
+use Piwik\UrlHelper;
 use Piwik\View;
 
 /*
