@@ -18,7 +18,6 @@ use Piwik\Plugins\PrivacyManager\Model\DataSubjects;
 use Piwik\Plugins\PrivacyManager\Dao\LogDataAnonymizer;
 use Piwik\Plugins\PrivacyManager\Model\LogDataAnonymizations;
 use Piwik\Plugins\PrivacyManager\Validators\VisitsDataSubject;
-use Piwik\Plugins\TagManager\Model\Tag;
 use Piwik\Site;
 use Piwik\Validators\BaseValidator;
 
@@ -142,7 +141,7 @@ class API extends \Piwik\Plugin\API
             }
             $disableVisitorLogSetting = $measurableSettings["Live"]->getSetting('disable_visitor_log');
             $disableVisitorProfileSetting = $measurableSettings["Live"]->getSetting('disable_visitor_profile');
-            
+
             $isVisitorLogDisabled = ($disableVisitorLogSetting && $disableVisitorLogSetting->getValue());
             $isVisitorProfileDisabled = ($disableVisitorProfileSetting && $disableVisitorProfileSetting->getValue());
 
@@ -162,7 +161,7 @@ class API extends \Piwik\Plugin\API
          * profiles disabled, then filter rows associated with those sites.
          *
          * For rows which whose site Id match a site with disabled visitor logs
-         * or profiles, all columns for said row, except those defined in 
+         * or profiles, all columns for said row, except those defined in
          * $GDPRColumnsToKeep, are removed.
          */
         if (count($siteIdsWithVisitorLogsOrProfilesDisabled) > 0) {
