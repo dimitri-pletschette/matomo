@@ -143,7 +143,6 @@ class API extends \Piwik\Plugin\API
                     $siteIdsWithVisitorLogsOrProfilesDisabled[] = $siteId;
                 }
             }
-
         }
 
         foreach ($result->getColumns() as $column) {

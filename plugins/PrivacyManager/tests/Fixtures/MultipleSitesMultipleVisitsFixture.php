@@ -23,7 +23,6 @@ use Piwik\Piwik;
 use Piwik\Plugins\UserCountry\LocationProvider;
 use Piwik\Tests\Framework\Fixture;
 use Piwik\Plugins\Goals\API as ApiGoals;
-use Piwik\Plugins\SitesManager\API as APISitesManager;
 use Piwik\Tracker\LogTable;
 use Piwik\Tests\Framework\Mock\LocationProvider as MockLocationProvider;
 
