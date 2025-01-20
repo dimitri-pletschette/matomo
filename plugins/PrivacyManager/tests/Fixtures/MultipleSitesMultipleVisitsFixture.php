@@ -23,6 +23,7 @@ use Piwik\Piwik;
 use Piwik\Plugins\UserCountry\LocationProvider;
 use Piwik\Tests\Framework\Fixture;
 use Piwik\Plugins\Goals\API as ApiGoals;
+use Piwik\Plugins\SitesManager\API as APISitesManager;
 use Piwik\Tracker\LogTable;
 use Piwik\Tests\Framework\Mock\LocationProvider as MockLocationProvider;
 
@@ -278,8 +279,65 @@ class MultipleSitesMultipleVisitsFixture extends Fixture
                 $this->assertSame($siteid, $idSite);
 
                 $this->createGoals($idSite, 2);
+                if ($idSite === 3) {
+                    $this->setSiteVisitorLogsDisabled($idSite);
+                }
+                if ($idSite === 1) {
+                    $this->setSiteVisitorProfilesDisabled($idSite);
+                }
             }
         }
+    }
+
+    public function setSiteVisitorLogsDisabled($idSite)
+    {
+        $settingValues = [
+            'Live' => [
+                    [
+                        'name' => 'disable_visitor_log',
+                        'value' => true
+                    ]
+                ]
+        ];
+        $this->updateSiteSettings($idSite, $settingValues);
+    }
+
+    private function setSiteVisitorProfilesDisabled($idSite)
+    {
+        $settingValues = [
+            'Live' => [
+                    [
+                        'name' => 'disable_visitor_profile',
+                        'value' => true
+                    ]
+                ]
+        ];
+        $this->updateSiteSettings($idSite, $settingValues);
+    }
+
+    private function updateSiteSettings($idSite, $settingValues)
+    {
+        APISitesManager::getInstance()->updateSite(
+            $idSite,
+            $siteName = null,
+            $urls = null,
+            $ecommerce = null,
+            $siteSearch = null,
+            $searchKeywordParameters = null,
+            $searchCategoryParameters = null,
+            $excludedIps = null,
+            $excludedQueryParameters = null,
+            $timezone = null,
+            $currency = null,
+            $group = null,
+            $startDate = null,
+            $excludedUserAgents = null,
+            $keepURLFragments = null,
+            $type = null,
+            $settingValues,
+            $excludeUnknownUrls = null,
+            $excludedReferrers = null
+        );
     }
 
     public function createGoals($idSite, $numGoals)
