@@ -289,7 +289,7 @@ class MultipleSitesMultipleVisitsFixture extends Fixture
         }
     }
 
-    public function setSiteVisitorLogsDisabled($idSite)
+    private function setSiteVisitorLogsDisabled($idSite)
     {
         $settingValues = [
             'Live' => [
