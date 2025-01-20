@@ -291,53 +291,14 @@ class MultipleSitesMultipleVisitsFixture extends Fixture
 
     private function setSiteVisitorLogsDisabled($idSite)
     {
-        $settingValues = [
-            'Live' => [
-                    [
-                        'name' => 'disable_visitor_log',
-                        'value' => true
-                    ]
-                ]
-        ];
-        $this->updateSiteSettings($idSite, $settingValues);
+        $settings = new \Piwik\Plugins\Live\MeasurableSettings($idSite);
+        $settings->disableVisitorLog->setValue(true);
     }
 
     private function setSiteVisitorProfilesDisabled($idSite)
     {
-        $settingValues = [
-            'Live' => [
-                    [
-                        'name' => 'disable_visitor_profile',
-                        'value' => true
-                    ]
-                ]
-        ];
-        $this->updateSiteSettings($idSite, $settingValues);
-    }
-
-    private function updateSiteSettings($idSite, $settingValues)
-    {
-        APISitesManager::getInstance()->updateSite(
-            $idSite,
-            $siteName = null,
-            $urls = null,
-            $ecommerce = null,
-            $siteSearch = null,
-            $searchKeywordParameters = null,
-            $searchCategoryParameters = null,
-            $excludedIps = null,
-            $excludedQueryParameters = null,
-            $timezone = null,
-            $currency = null,
-            $group = null,
-            $startDate = null,
-            $excludedUserAgents = null,
-            $keepURLFragments = null,
-            $type = null,
-            $settingValues,
-            $excludeUnknownUrls = null,
-            $excludedReferrers = null
-        );
+        $settings = new \Piwik\Plugins\Live\MeasurableSettings($idSite);
+        $settings->disableVisitorProfile->setValue(true);
     }
 
     public function createGoals($idSite, $numGoals)
