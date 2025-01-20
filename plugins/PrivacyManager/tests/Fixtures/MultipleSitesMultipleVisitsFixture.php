@@ -293,12 +293,14 @@ class MultipleSitesMultipleVisitsFixture extends Fixture
     {
         $settings = new \Piwik\Plugins\Live\MeasurableSettings($idSite);
         $settings->disableVisitorLog->setValue(true);
+        $settings->save();
     }
 
     private function setSiteVisitorProfilesDisabled($idSite)
     {
         $settings = new \Piwik\Plugins\Live\MeasurableSettings($idSite);
         $settings->disableVisitorProfile->setValue(true);
+        $settings->save();
     }
 
     public function createGoals($idSite, $numGoals)
