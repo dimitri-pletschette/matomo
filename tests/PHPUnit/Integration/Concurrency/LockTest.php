@@ -186,6 +186,25 @@ class LockTest extends IntegrationTestCase
         $this->assertNotEquals($expireTime, $newExpireTime);
     }
 
+    public function testLockExistsReturnsFalseIfLockDoesNotExist(): void
+    {
+        $this->assertFalse($this->lock->lockExists('unit_test'));
+    }
+
+    public function testLockExistsReturnsFalseIfLockExpired(): void
+    {
+        $this->lock->acquireLock('unit_test', 0.1);
+        sleep(1);
+        $this->assertFalse($this->lock->lockExists('unit_test'));
+    }
+
+    public function testLockExistsReturnsTrueIfLockExists(): void
+    {
+        $this->lock->acquireLock('unit_test');
+
+        $this->assertTrue($this->lock->lockExists('unit_test'));
+    }
+
     private function assertNumberOfLocksEquals($numExpectedLocks)
     {
         $this->assertSame($numExpectedLocks, $this->lock->getNumberOfAcquiredLocks());

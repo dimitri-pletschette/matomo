@@ -149,6 +149,25 @@ class Lock
     }
 
     /**
+     * Checks if a lock exists for a given ID.
+     *
+     * @param string $id
+     * @return bool
+     */
+    public function lockExists(string $id): bool
+    {
+        $lockKey = $this->namespace . $id;
+
+        if (mb_strlen($lockKey) > self::MAX_KEY_LEN) {
+            // Ensure the lock key isn't too long
+            $md5Len = 32;
+            $lockKey = mb_substr($lockKey, 0, self::MAX_KEY_LEN - $md5Len - 1) . md5($id);
+        }
+
+        return (bool) $this->backend->get($lockKey);
+    }
+
+    /**
      * Return if the acquired lock is currently locked
      *
      * @return bool
