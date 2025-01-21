@@ -14,6 +14,10 @@
         {{ translate('MultiSites_AllWebsitesDashboardTitle') }}
       </EnrichedHeadline>
     </h1>
+    <FeatureFlagToggle
+      description="Switch to new Layout"
+      feature-name="ImprovedAllWebsitesDashboard"
+    ></FeatureFlagToggle>
   </div>
 
   <div v-if="errorLoading">
@@ -83,6 +87,7 @@ import {
   Matomo,
   MatomoUrl,
 } from 'CoreHome';
+import { FeatureFlagToggle } from 'FeatureFlags';
 
 import DashboardStore from './AllWebsitesDashboard.store';
 import KPICardContainer from './KPICardContainer.vue';
@@ -95,6 +100,7 @@ interface DashboardState {
 
 export default defineComponent({
   components: {
+    FeatureFlagToggle,
     EnrichedHeadline,
     KPICardContainer,
     SitesTable,

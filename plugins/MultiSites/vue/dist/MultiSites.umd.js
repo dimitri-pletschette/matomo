@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("CoreHome"), require("vue"));
+		module.exports = factory(require("CoreHome"), require("vue"), require("FeatureFlags"));
 	else if(typeof define === 'function' && define.amd)
-		define(["CoreHome", ], factory);
+		define(["CoreHome", , "FeatureFlags"], factory);
 	else if(typeof exports === 'object')
-		exports["MultiSites"] = factory(require("CoreHome"), require("vue"));
+		exports["MultiSites"] = factory(require("CoreHome"), require("vue"), require("FeatureFlags"));
 	else
-		root["MultiSites"] = factory(root["CoreHome"], root["Vue"]);
-})((typeof self !== 'undefined' ? self : this), function(__WEBPACK_EXTERNAL_MODULE__19dc__, __WEBPACK_EXTERNAL_MODULE__8bbf__) {
+		root["MultiSites"] = factory(root["CoreHome"], root["Vue"], root["FeatureFlags"]);
+})((typeof self !== 'undefined' ? self : this), function(__WEBPACK_EXTERNAL_MODULE__19dc__, __WEBPACK_EXTERNAL_MODULE__8bbf__, __WEBPACK_EXTERNAL_MODULE_f476__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -110,6 +110,13 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__8bbf__;
 
 /***/ }),
 
+/***/ "f476":
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_f476__;
+
+/***/ }),
+
 /***/ "fae3":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -142,7 +149,7 @@ if (typeof window !== 'undefined') {
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
 
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/MultiSites/vue/src/AllWebsitesDashboard/AllWebsitesDashboard.vue?vue&type=template&id=707936a9
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/MultiSites/vue/src/AllWebsitesDashboard/AllWebsitesDashboard.vue?vue&type=template&id=0228250d
 
 var _hoisted_1 = {
   class: "dashboardHeader"
@@ -185,6 +192,8 @@ var _hoisted_17 = ["href"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_EnrichedHeadline = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("EnrichedHeadline");
 
+  var _component_FeatureFlagToggle = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("FeatureFlagToggle");
+
   var _component_KPICardContainer = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("KPICardContainer");
 
   var _component_SitesTable = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("SitesTable");
@@ -196,7 +205,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('MultiSites_AllWebsitesDashboardTitle')), 1)];
     }),
     _: 1
-  }, 8, ["feature-name"])])]), _ctx.errorLoading ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", _hoisted_3, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('MultiSites_AllWebsitesDashboardErrorMessage')) + " ", 1), _hoisted_5, _hoisted_6, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(" " + Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_NeedMoreHelp', '', '')) + " ", 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
+  }, 8, ["feature-name"])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_FeatureFlagToggle, {
+    description: "Switch to new Layout",
+    "feature-name": "ImprovedAllWebsitesDashboard"
+  })]), _ctx.errorLoading ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", _hoisted_3, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('MultiSites_AllWebsitesDashboardErrorMessage')) + " ", 1), _hoisted_5, _hoisted_6, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(" " + Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_NeedMoreHelp', '', '')) + " ", 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
     rel: "noreferrer noopener",
     target: "_blank",
     href: _ctx.externalRawLink('https://matomo.org/faq/troubleshooting/faq_19489/')
@@ -235,10 +247,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "display-sparklines": _ctx.displaySparklines
   }, null, 8, ["display-revenue", "display-sparklines"])], 64);
 }
-// CONCATENATED MODULE: ./plugins/MultiSites/vue/src/AllWebsitesDashboard/AllWebsitesDashboard.vue?vue&type=template&id=707936a9
+// CONCATENATED MODULE: ./plugins/MultiSites/vue/src/AllWebsitesDashboard/AllWebsitesDashboard.vue?vue&type=template&id=0228250d
 
 // EXTERNAL MODULE: external "CoreHome"
 var external_CoreHome_ = __webpack_require__("19dc");
+
+// EXTERNAL MODULE: external "FeatureFlags"
+var external_FeatureFlags_ = __webpack_require__("f476");
 
 // CONCATENATED MODULE: ./plugins/MultiSites/vue/src/AllWebsitesDashboard/AllWebsitesDashboard.store.ts
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1157,8 +1172,10 @@ SitesTablevue_type_script_lang_ts.render = SitesTablevue_type_template_id_a36a8c
 
 
 
+
 /* harmony default export */ var AllWebsitesDashboardvue_type_script_lang_ts = (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["defineComponent"])({
   components: {
+    FeatureFlagToggle: external_FeatureFlags_["FeatureFlagToggle"],
     EnrichedHeadline: external_CoreHome_["EnrichedHeadline"],
     KPICardContainer: KPICardContainer,
     SitesTable: SitesTable
@@ -1793,88 +1810,88 @@ var Dashboard_store_DashboardStore = /*#__PURE__*/function () {
 }();
 
 /* harmony default export */ var Dashboard_store = (new Dashboard_store_DashboardStore());
-// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/MultiSites/vue/src/Dashboard/Dashboard.vue?vue&type=template&id=c3a6c2b2
+// CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-babel/node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/@vue/cli-plugin-babel/node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist/templateLoader.js??ref--6!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/MultiSites/vue/src/Dashboard/Dashboard.vue?vue&type=template&id=08ded8a1
 
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_1 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_1 = {
   ref: "root"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_2 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_2 = {
   class: "card-title"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_3 = ["innerHTML", "title"];
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_4 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_3 = ["innerHTML", "title"];
+var Dashboardvue_type_template_id_08ded8a1_hoisted_4 = {
   id: "mt",
   class: "dataTable card-table",
   cellspacing: "0"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_5 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_5 = {
   class: "heading"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_6 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_6 = {
   class: "heading"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_7 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_7 = {
   class: "heading"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_8 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_8 = {
   class: "heading"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_9 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_9 = {
   class: "heading"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_10 = ["colspan"];
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_11 = ["value"];
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_12 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_10 = ["colspan"];
+var Dashboardvue_type_template_id_08ded8a1_hoisted_11 = ["value"];
+var Dashboardvue_type_template_id_08ded8a1_hoisted_12 = {
   value: "visits_evolution"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_13 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_13 = {
   value: "pageviews_evolution"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_14 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_14 = {
   value: "hits_evolution"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_15 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_15 = {
   key: 0,
   value: "revenue_evolution"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_16 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_16 = {
   key: 0
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_17 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_17 = {
   colspan: "7",
   class: "allWebsitesLoading"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_18 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_18 = {
   key: 1
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_19 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_19 = {
   key: 0
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_20 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_20 = {
   colspan: "7"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_21 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_21 = {
   class: "notification system notification-error"
 };
 
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_22 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("br", null, null, -1);
+var Dashboardvue_type_template_id_08ded8a1_hoisted_22 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("br", null, null, -1);
 
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_23 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("br", null, null, -1);
+var Dashboardvue_type_template_id_08ded8a1_hoisted_23 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("br", null, null, -1);
 
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_24 = ["href"];
+var Dashboardvue_type_template_id_08ded8a1_hoisted_24 = ["href"];
 
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_25 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(" – ");
+var Dashboardvue_type_template_id_08ded8a1_hoisted_25 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(" – ");
 
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_26 = ["href"];
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_27 = ["href"];
+var Dashboardvue_type_template_id_08ded8a1_hoisted_26 = ["href"];
+var Dashboardvue_type_template_id_08ded8a1_hoisted_27 = ["href"];
 
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_28 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(". ");
+var Dashboardvue_type_template_id_08ded8a1_hoisted_28 = /*#__PURE__*/Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(". ");
 
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_29 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_29 = {
   colspan: "8",
   class: "paging"
 };
-var Dashboardvue_type_template_id_c3a6c2b2_hoisted_30 = {
+var Dashboardvue_type_template_id_08ded8a1_hoisted_30 = {
   class: "row"
 };
 var _hoisted_31 = {
@@ -1926,16 +1943,18 @@ var _hoisted_43 = {
 };
 var _hoisted_44 = ["placeholder"];
 var _hoisted_45 = ["title"];
-function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $setup, $data, $options) {
+function Dashboardvue_type_template_id_08ded8a1_render(_ctx, _cache, $props, $setup, $data, $options) {
   var _this = this;
 
   var _component_EnrichedHeadline = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("EnrichedHeadline");
+
+  var _component_FeatureFlagToggle = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("FeatureFlagToggle");
 
   var _component_ActivityIndicator = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("ActivityIndicator");
 
   var _component_MultisitesSite = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["resolveComponent"])("MultisitesSite");
 
-  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", Dashboardvue_type_template_id_c3a6c2b2_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", Dashboardvue_type_template_id_c3a6c2b2_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_EnrichedHeadline, {
+  return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("div", Dashboardvue_type_template_id_08ded8a1_hoisted_1, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("h2", Dashboardvue_type_template_id_08ded8a1_hoisted_2, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_EnrichedHeadline, {
     "help-url": _ctx.externalRawLink('https://matomo.org/faq/new-to-piwik/all-websites-dashboard/'),
     "feature-name": _ctx.translate('General_AllWebsitesDashboard')
   }, {
@@ -1944,10 +1963,13 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
         class: "smallTitle",
         innerHTML: _ctx.$sanitize(_this.smallTitleContent),
         title: _ctx.smallTitleTooltip
-      }, null, 8, Dashboardvue_type_template_id_c3a6c2b2_hoisted_3)];
+      }, null, 8, Dashboardvue_type_template_id_08ded8a1_hoisted_3)];
     }),
     _: 1
-  }, 8, ["help-url", "feature-name"])]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("table", Dashboardvue_type_template_id_c3a6c2b2_hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("thead", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", {
+  }, 8, ["help-url", "feature-name"]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_FeatureFlagToggle, {
+    description: "Switch to new Layout",
+    "feature-name": "ImprovedAllWebsitesDashboard"
+  })]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("table", Dashboardvue_type_template_id_08ded8a1_hoisted_4, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("thead", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", {
     id: "names",
     class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])(["label", {
       columnSorted: 'label' === _ctx.sortColumn
@@ -1955,7 +1977,7 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
     onClick: _cache[0] || (_cache[0] = function ($event) {
       return _ctx.sortBy('label');
     })
-  }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_c3a6c2b2_hoisted_5, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Website')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
+  }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_08ded8a1_hoisted_5, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Website')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
     class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])(["arrow", {
       multisites_asc: !_ctx.reverse && 'label' === _ctx.sortColumn,
       multisites_desc: _ctx.reverse && 'label' === _ctx.sortColumn
@@ -1979,7 +2001,7 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
     style: {
       "margin-right": "3.5px"
     }
-  }, null, 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_c3a6c2b2_hoisted_6, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnNbVisits')), 1)], 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", {
+  }, null, 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_08ded8a1_hoisted_6, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnNbVisits')), 1)], 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", {
     id: "pageviews",
     class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])(["multisites-column", {
       columnSorted: 'nb_pageviews' === _ctx.sortColumn
@@ -1995,7 +2017,7 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
     style: {
       "margin-right": "3.5px"
     }
-  }, null, 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_c3a6c2b2_hoisted_7, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnPageviews')), 1)], 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", {
+  }, null, 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_08ded8a1_hoisted_7, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnPageviews')), 1)], 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", {
     id: "hits",
     class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])(["multisites-column", {
       columnSorted: 'hits' === _ctx.sortColumn
@@ -2011,7 +2033,7 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
     style: {
       "margin-right": "3.5px"
     }
-  }, null, 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_c3a6c2b2_hoisted_8, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnHits')), 1)], 2), _ctx.displayRevenueColumn ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("th", {
+  }, null, 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_08ded8a1_hoisted_8, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnHits')), 1)], 2), _ctx.displayRevenueColumn ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("th", {
     key: 0,
     id: "revenue",
     class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])(["multisites-column", {
@@ -2028,7 +2050,7 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
     style: {
       "margin-right": "3.5px"
     }
-  }, null, 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_c3a6c2b2_hoisted_9, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnRevenue')), 1)], 2)) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", {
+  }, null, 2), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", Dashboardvue_type_template_id_08ded8a1_hoisted_9, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnRevenue')), 1)], 2)) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("th", {
     id: "evolution",
     class: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["normalizeClass"])({
       columnSorted: _ctx.evolutionSelector === _ctx.sortColumn
@@ -2059,22 +2081,22 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
 
       _ctx.sortBy(_ctx.evolutionSelector);
     })
-  }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("option", Dashboardvue_type_template_id_c3a6c2b2_hoisted_12, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnNbVisits')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("option", Dashboardvue_type_template_id_c3a6c2b2_hoisted_13, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnPageviews')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("option", Dashboardvue_type_template_id_c3a6c2b2_hoisted_14, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnHits')), 1), _ctx.displayRevenueColumn ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("option", Dashboardvue_type_template_id_c3a6c2b2_hoisted_15, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnRevenue')), 1)) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true)], 40, Dashboardvue_type_template_id_c3a6c2b2_hoisted_11)], 10, Dashboardvue_type_template_id_c3a6c2b2_hoisted_10)])]), _ctx.isLoading ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tbody", Dashboardvue_type_template_id_c3a6c2b2_hoisted_16, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", Dashboardvue_type_template_id_c3a6c2b2_hoisted_17, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
+  }, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("option", Dashboardvue_type_template_id_08ded8a1_hoisted_12, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnNbVisits')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("option", Dashboardvue_type_template_id_08ded8a1_hoisted_13, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnPageviews')), 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("option", Dashboardvue_type_template_id_08ded8a1_hoisted_14, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnHits')), 1), _ctx.displayRevenueColumn ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("option", Dashboardvue_type_template_id_08ded8a1_hoisted_15, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ColumnRevenue')), 1)) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true)], 40, Dashboardvue_type_template_id_08ded8a1_hoisted_11)], 10, Dashboardvue_type_template_id_08ded8a1_hoisted_10)])]), _ctx.isLoading ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tbody", Dashboardvue_type_template_id_08ded8a1_hoisted_16, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", Dashboardvue_type_template_id_08ded8a1_hoisted_17, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createVNode"])(_component_ActivityIndicator, {
     "loading-message": _ctx.loadingMessage,
     loading: _ctx.isLoading
-  }, null, 8, ["loading-message", "loading"])])])])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), !_ctx.isLoading ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tbody", Dashboardvue_type_template_id_c3a6c2b2_hoisted_18, [_ctx.errorLoadingSites ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", Dashboardvue_type_template_id_c3a6c2b2_hoisted_19, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", Dashboardvue_type_template_id_c3a6c2b2_hoisted_20, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", Dashboardvue_type_template_id_c3a6c2b2_hoisted_21, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ErrorRequest', '', '')) + " ", 1), Dashboardvue_type_template_id_c3a6c2b2_hoisted_22, Dashboardvue_type_template_id_c3a6c2b2_hoisted_23, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(" " + Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_NeedMoreHelp')) + " ", 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
+  }, null, 8, ["loading-message", "loading"])])])])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), !_ctx.isLoading ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tbody", Dashboardvue_type_template_id_08ded8a1_hoisted_18, [_ctx.errorLoadingSites ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("tr", Dashboardvue_type_template_id_08ded8a1_hoisted_19, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", Dashboardvue_type_template_id_08ded8a1_hoisted_20, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", Dashboardvue_type_template_id_08ded8a1_hoisted_21, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_ErrorRequest', '', '')) + " ", 1), Dashboardvue_type_template_id_08ded8a1_hoisted_22, Dashboardvue_type_template_id_08ded8a1_hoisted_23, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(" " + Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_NeedMoreHelp')) + " ", 1), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
     rel: "noreferrer noopener",
     target: "_blank",
     href: _ctx.externalRawLink('https://matomo.org/faq/troubleshooting/faq_19489/')
-  }, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Faq')), 9, Dashboardvue_type_template_id_c3a6c2b2_hoisted_24), Dashboardvue_type_template_id_c3a6c2b2_hoisted_25, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
+  }, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('General_Faq')), 9, Dashboardvue_type_template_id_08ded8a1_hoisted_24), Dashboardvue_type_template_id_08ded8a1_hoisted_25, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
     rel: "noreferrer noopener",
     target: "_blank",
     href: _ctx.externalRawLink('https://forum.matomo.org/')
-  }, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('Feedback_CommunityHelp')), 9, Dashboardvue_type_template_id_c3a6c2b2_hoisted_26), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", null, " – ", 512), [[external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], _ctx.areAdsForProfessionalServicesEnabled]]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
+  }, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('Feedback_CommunityHelp')), 9, Dashboardvue_type_template_id_08ded8a1_hoisted_26), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", null, " – ", 512), [[external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], _ctx.areAdsForProfessionalServicesEnabled]]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("a", {
     rel: "noreferrer noopener",
     target: "_blank",
     href: _ctx.professionalHelpUrl
-  }, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('Feedback_ProfessionalHelp')), 9, Dashboardvue_type_template_id_c3a6c2b2_hoisted_27), [[external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], _ctx.areAdsForProfessionalServicesEnabled]]), Dashboardvue_type_template_id_c3a6c2b2_hoisted_28])])])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.sites, function (website) {
+  }, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('Feedback_ProfessionalHelp')), 9, Dashboardvue_type_template_id_08ded8a1_hoisted_27), [[external_commonjs_vue_commonjs2_vue_root_Vue_["vShow"], _ctx.areAdsForProfessionalServicesEnabled]]), Dashboardvue_type_template_id_08ded8a1_hoisted_28])])])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])(external_commonjs_vue_commonjs2_vue_root_Vue_["Fragment"], null, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["renderList"])(_ctx.sites, function (website) {
     return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createBlock"])(_component_MultisitesSite, {
       key: website.idsite,
       website: website,
@@ -2084,7 +2106,7 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
       metric: _ctx.sortColumn,
       "display-revenue-column": _ctx.displayRevenueColumn
     }, null, 8, ["website", "evolution-metric", "date-sparkline", "show-sparklines", "metric", "display-revenue-column"]);
-  }), 128))])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tfoot", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", Dashboardvue_type_template_id_c3a6c2b2_hoisted_29, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", Dashboardvue_type_template_id_c3a6c2b2_hoisted_30, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_31, [_ctx.hasSuperUserAccess ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("a", {
+  }), 128))])) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tfoot", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("tr", null, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("td", Dashboardvue_type_template_id_08ded8a1_hoisted_29, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", Dashboardvue_type_template_id_08ded8a1_hoisted_30, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_31, [_ctx.hasSuperUserAccess ? (Object(external_commonjs_vue_commonjs2_vue_root_Vue_["openBlock"])(), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementBlock"])("a", {
     key: 0,
     href: _ctx.addSiteUrl
   }, [_hoisted_33, Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createTextVNode"])(" " + Object(external_commonjs_vue_commonjs2_vue_root_Vue_["toDisplayString"])(_ctx.translate('SitesManager_AddSite')), 1)], 8, _hoisted_32)) : Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createCommentVNode"])("", true)]), Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("div", _hoisted_34, [Object(external_commonjs_vue_commonjs2_vue_root_Vue_["withDirectives"])(Object(external_commonjs_vue_commonjs2_vue_root_Vue_["createElementVNode"])("span", {
@@ -2116,9 +2138,10 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
     title: _ctx.translate('General_ClickToSearch')
   }, null, 8, _hoisted_45)])])])])])])], 512);
 }
-// CONCATENATED MODULE: ./plugins/MultiSites/vue/src/Dashboard/Dashboard.vue?vue&type=template&id=c3a6c2b2
+// CONCATENATED MODULE: ./plugins/MultiSites/vue/src/Dashboard/Dashboard.vue?vue&type=template&id=08ded8a1
 
 // CONCATENATED MODULE: ./node_modules/@vue/cli-plugin-typescript/node_modules/cache-loader/dist/cjs.js??ref--14-0!./node_modules/babel-loader/lib!./node_modules/@vue/cli-plugin-typescript/node_modules/ts-loader??ref--14-2!./node_modules/@vue/cli-service/node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/@vue/cli-service/node_modules/vue-loader-v16/dist??ref--0-1!./plugins/MultiSites/vue/src/Dashboard/Dashboard.vue?vue&type=script&lang=ts
+
 
 
 
@@ -2132,6 +2155,7 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
     autoRefreshTodayReport: Number
   },
   components: {
+    FeatureFlagToggle: external_FeatureFlags_["FeatureFlagToggle"],
     EnrichedHeadline: external_CoreHome_["EnrichedHeadline"],
     ActivityIndicator: external_CoreHome_["ActivityIndicator"],
     MultisitesSite: MultisitesSite
@@ -2241,7 +2265,7 @@ function Dashboardvue_type_template_id_c3a6c2b2_render(_ctx, _cache, $props, $se
 
 
 
-Dashboardvue_type_script_lang_ts.render = Dashboardvue_type_template_id_c3a6c2b2_render
+Dashboardvue_type_script_lang_ts.render = Dashboardvue_type_template_id_08ded8a1_render
 
 /* harmony default export */ var Dashboard = (Dashboardvue_type_script_lang_ts);
 // CONCATENATED MODULE: ./plugins/MultiSites/vue/src/index.ts
