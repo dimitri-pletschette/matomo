@@ -16,6 +16,8 @@ use Piwik\Access\CapabilitiesProvider;
 use Piwik\Access\RolesProvider;
 use Piwik\Auth\Password;
 use Piwik\Common;
+use Piwik\Concurrency\Lock;
+use Piwik\Concurrency\LockBackend;
 use Piwik\Config;
 use Piwik\Container\StaticContainer;
 use Piwik\Date;
@@ -1132,12 +1134,38 @@ class API extends \Piwik\Plugin\API
         $this->checkUserExist($userLogin);
         $this->checkUsersHasNotSuperUserAccess($userLogin);
 
+        $lock = $this->getLockIfRevoking($userLogin, $role);
+
         $this->performModificationToAccess($userLogin, $idSites, $access, $role, $capabilities);
 
         $this->sendNotificationAboutAccessChangeIfApplicable($userLogin, $access, $idSites);
 
         // we reload the access list which doesn't yet take in consideration this new user access
         $this->reloadPermissions();
+
+        $lock->unlock();
+    }
+
+    /**
+     * @param string $userLogin
+     * @param string $role
+     * @return Lock
+     */
+    private function getLockIfRevoking(string $userLogin, string $role): Lock
+    {
+        $lock = new Lock(StaticContainer::get(LockBackend::class), 'UsersManager_SetUserAccess', 10);
+
+        if ($lock->lockExists($userLogin)) {
+            throw new Exception(Piwik::translate('UsersManager_ExceptionLocked'));
+        }
+
+        if ($role !== 'admin') {
+            $lockAcquired = $lock->acquireLock($userLogin);
+            if ($lockAcquired === false) {
+                throw new Exception(Piwik::translate('UsersManager_ExceptionLocked'));
+            }
+        }
+        return $lock;
     }
 
     /**
