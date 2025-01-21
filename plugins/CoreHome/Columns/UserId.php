@@ -52,7 +52,7 @@ class UserId extends VisitDimension
     public function configureSegments(SegmentsList $segmentsList, DimensionSegmentFactory $dimensionSegmentFactory)
     {
         // Configure userId segment only if visitor profile is available
-        if (Live::isVisitorProfileEnabled() || \Piwik\API\Request::getRootApiRequestMethod() === 'PrivacyManager.findDataSubjects') {
+        if (Live::isVisitorProfileEnabled() || \Piwik\API\Request::getRootApiRequestMethod() === 'API.getSegmentsMetadata') {
             parent::configureSegments($segmentsList, $dimensionSegmentFactory);
         }
     }
