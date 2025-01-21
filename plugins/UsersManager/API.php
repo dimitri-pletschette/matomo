@@ -1127,6 +1127,52 @@ class API extends \Piwik\Plugin\API
             ));
         }
 
+        list($role, $capabilities) = $this->extractRoleAndCapabilitiesFromAccess($access);
+
+        $this->checkUserExist($userLogin);
+        $this->checkUsersHasNotSuperUserAccess($userLogin);
+
+        $this->performModificationToAccess($userLogin, $idSites, $access, $role, $capabilities);
+
+        $this->sendNotificationAboutAccessChangeIfApplicable($userLogin, $access, $idSites);
+
+        // we reload the access list which doesn't yet take in consideration this new user access
+        $this->reloadPermissions();
+    }
+
+    /**
+     * @param string $userLogin
+     * @param array $idSites
+     * @param array|string $access
+     * @param string $role
+     * @param array $capabilities
+     * @return void
+     * @throws Exception
+     */
+    private function performModificationToAccess(string $userLogin, array $idSites, $access, string $role, array $capabilities): void
+    {
+        $this->model->deleteUserAccess($userLogin, $idSites);
+
+        if ($access === 'noaccess') {
+            // if the access is noaccess then we don't save it as this is the default value
+            // when no access are specified
+            Piwik::postEvent('UsersManager.removeSiteAccess', [$userLogin, $idSites]);
+        } else {
+            $this->model->addUserAccess($userLogin, $role, $idSites);
+        }
+
+        if (!empty($capabilities)) {
+            $this->addCapabilities($userLogin, $capabilities, $idSites);
+        }
+    }
+
+    /**
+     * @param array|string $access
+     * @return array
+     * @throws Exception
+     */
+    private function extractRoleAndCapabilitiesFromAccess($access): array
+    {
         $roles = [];
         $capabilities = [];
 
@@ -1150,25 +1196,21 @@ class API extends \Piwik\Plugin\API
                 $roles[] = $access;
             }
         }
+        return [array_shift($roles), $capabilities];
+    }
 
-        $this->checkUserExist($userLogin);
-        $this->checkUsersHasNotSuperUserAccess($userLogin);
-
-        $this->model->deleteUserAccess($userLogin, $idSites);
-
-        if ($access === 'noaccess') {
-            // if the access is noaccess then we don't save it as this is the default value
-            // when no access are specified
-            Piwik::postEvent('UsersManager.removeSiteAccess', [$userLogin, $idSites]);
-        } else {
-            $role = array_shift($roles);
-            $this->model->addUserAccess($userLogin, $role, $idSites);
-        }
-
-        if (!empty($capabilities)) {
-            $this->addCapabilities($userLogin, $capabilities, $idSites);
-        }
-
+    /**
+     * @param string $userLogin
+     * @param array|string $access
+     * @param array $idSites
+     * @return void
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
+     * @throws \Piwik\Exception\DI\DependencyException
+     * @throws \Piwik\Exception\DI\NotFoundException
+     */
+    private function sendNotificationAboutAccessChangeIfApplicable(string $userLogin, $access, array $idSites): void
+    {
         // Send notification to all super users if anonymous access is set for a site
         if ($userLogin === 'anonymous' && $access === 'view') {
             $container = StaticContainer::getContainer();
@@ -1189,9 +1231,6 @@ class API extends \Piwik\Plugin\API
                 $email->safeSend();
             }
         }
-
-        // we reload the access list which doesn't yet take in consideration this new user access
-        $this->reloadPermissions();
     }
 
     /**
