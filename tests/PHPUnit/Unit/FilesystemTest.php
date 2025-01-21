@@ -424,4 +424,26 @@ class FilesystemTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull($size);
     }
+
+    /**
+     * @dataProvider getSanitizeFilenameTestData
+     */
+    public function testSanitizeFilename(string $filename, string $expected): void
+    {
+        $this->assertSame(
+            $expected,
+            Filesystem::sanitizeFilename($filename)
+        );
+    }
+
+    public function getSanitizeFilenameTestData(): array
+    {
+        return [
+            ['reserved<>:"/\\|?*characters', 'reservedcharacters'],
+            ["control\x00\x09\x0A\x7Fcharacters", 'controlcharacters'],
+            ['  spaces are trimmed  ', 'spaces are trimmed'],
+            ['unicode    spaces', 'unicode    spaces'],
+            ['unicode‒–—dashes', 'unicode---dashes'],
+        ];
+    }
 }
