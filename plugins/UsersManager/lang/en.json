@@ -236,6 +236,7 @@
         "AuthTokenSecureOnlyHelp": "Enable this option to only allow this token to be used in a secure way (e.g. POST requests), this is recommended as a best security practice. The token will then not be valid as a URL parameter in GET requests.",
         "AuthTokenSecureOnlyHelpForced": "The system administrator has configured Matomo to only allow tokens to be created for use in secure way (e.g. via POST requests), you cannot change this token option.",
         "OnlyAllowSecureRequests": "Only allow secure requests",
-        "SecureUseOnly": "Secure use only"
+        "SecureUseOnly": "Secure use only",
+        "ExceptionLocked": "This user is locked for modification"
     }
 }
