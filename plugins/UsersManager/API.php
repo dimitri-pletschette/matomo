@@ -1337,6 +1337,9 @@ class API extends \Piwik\Plugin\API
 
     private function getIdSitesCheckAdminAccess($idSites)
     {
+        // reload access to ensure we're not working with cached entries that might have been changed in between
+        Access::getInstance()->reloadAccess();
+
         if ($idSites === 'all') {
             // in case idSites is all we grant access to all the websites on which the current connected user has an 'admin' access
             $idSites = \Piwik\Plugins\SitesManager\API::getInstance()->getSitesIdWithAdminAccess();
