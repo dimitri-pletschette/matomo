@@ -365,7 +365,7 @@ class Twig
     protected function addFilterSafeDecodeRaw()
     {
         $rawSafeDecoded = new TwigFilter('rawSafeDecoded', function ($string) {
-
+            $string = is_scalar($string) ? strval($string) : null;
             if ($string === null) {
                 return '';
             }
