@@ -44,27 +44,46 @@
      * @param {String} idSite The ID of the site.
      */
     VisitorProfileControl.showPopover = function (visitorId, idSite) {
-
-        if (!piwik.visitorProfileEnabled) {
+        var showProfile = function(visitorId, idSite, visitorProfileEnabled) {
+          if (!piwik.visitorProfileEnabled && (!idSite || piwik.idSite == idSite)) {
             console.error('Visitor Profile was disabled in website settings');
             return;
-        }
+          }
 
-        var url = 'module=Live&action=getVisitorProfilePopup&visitorId=' + encodeURIComponent(visitorId);
-        if (idSite) {
+          var url = 'module=Live&action=getVisitorProfilePopup&visitorId=' + encodeURIComponent(visitorId);
+          if (idSite) {
             url += '&idSite=' + idSite;
-        }
+          }
 
-        // if there is already a map shown on the screen, do not show the map in the popup. kartograph seems
-        // to only support showing one map at a time.
-        if ($('.RealTimeMap').length > 0) {
+          // if there is already a map shown on the screen, do not show the map in the popup. kartograph seems
+          // to only support showing one map at a time.
+          if ($('.RealTimeMap').length > 0) {
             url += '&showMap=0';
+          }
+
+          var ajaxRequest = new ajaxHelper();
+          ajaxRequest.removeDefaultParameter('segment');
+
+          Piwik_Popover.createPopupAndLoadUrl(url, _pk_translate('Live_VisitorProfile'), 'visitor-profile-popup', ajaxRequest);
         }
 
-        var ajaxRequest = new ajaxHelper();
-        ajaxRequest.removeDefaultParameter('segment');
+        if (idSite && idSite != piwik.idSite) {
+          var ajax = new ajaxHelper();
+          ajax.addParams({
+            module: 'API',
+            method: 'Live.isVisitorProfileEnabled',
+            format: 'json',
+            idSite: idSite
+          }, 'GET');
+          ajax.setCallback(function (response) {
+            showProfile(visitorId, idSite, response && response.value);
+          });
+          ajax.send();
+        } else {
+          showProfile(visitorId, idSite, piwik.visitorProfileEnabled);
+        }
 
-        Piwik_Popover.createPopupAndLoadUrl(url, _pk_translate('Live_VisitorProfile'), 'visitor-profile-popup', ajaxRequest);
+
     };
 
     $.extend(VisitorProfileControl.prototype, UIControl.prototype, {
