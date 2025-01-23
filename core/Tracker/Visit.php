@@ -16,6 +16,7 @@ use Piwik\Container\StaticContainer;
 use Piwik\Date;
 use Piwik\Exception\UnexpectedWebsiteFoundException;
 use Matomo\Network\IPUtils;
+use Piwik\Piwik;
 use Piwik\Plugin\Dimension\VisitDimension;
 use Piwik\Plugins\Actions\Tracker\ActionsRequestProcessor;
 use Piwik\Plugins\UserCountry\Columns\Base;
@@ -429,17 +430,20 @@ class Visit implements VisitInterface
 
         $idSite = $this->request->getIdSite();
         $idVisit = $this->visitProperties->getProperty('idvisit');
+        $model = $this->getModel();
 
-        $wasInserted = $this->getModel()->updateVisit($idSite, $idVisit, $valuesToUpdate);
+        $wasInserted = $model->updateVisit($idSite, $idVisit, $valuesToUpdate);
 
         // Debug output
         if (isset($valuesToUpdate['idvisitor'])) {
+            $model->updateVisitorIDForConversion($idVisit, $valuesToUpdate['idvisitor']);
+            Piwik::postEvent('Visit.updateIDVisitor', [$idVisit, $valuesToUpdate['idvisitor']]);
             $valuesToUpdate['idvisitor'] = bin2hex($valuesToUpdate['idvisitor']);
         }
 
         if ($wasInserted) {
             Common::printDebug('Updated existing visit: ' . var_export($valuesToUpdate, true));
-        } elseif (!$this->getModel()->hasVisit($idSite, $idVisit)) {
+        } elseif (!$model->hasVisit($idSite, $idVisit)) {
             // mostly for WordPress. see https://github.com/matomo-org/matomo/pull/15587
             // as WP doesn't set `MYSQLI_CLIENT_FOUND_ROWS` and therefore when the update succeeded but no value changed
             // it would still return 0 vs OnPremise would return 1 or 2.
