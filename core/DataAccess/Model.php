@@ -713,8 +713,10 @@ class Model
         $table = Common::prefixTable('archive_invalidations');
 
         // set archive value to in progress if not set already
-        $statement = Db::query("UPDATE `$table` SET `status` = ?, ts_started = NOW() WHERE idinvalidation = ? AND status = ?", [
+        $statement = Db::query("UPDATE `$table` SET `status` = ?, processing_host = ?, process_id = ?, ts_started = NOW() WHERE idinvalidation = ? AND status = ?", [
             ArchiveInvalidator::INVALIDATION_STATUS_IN_PROGRESS,
+            gethostname() ?: null,
+            Common::getProcessId(),
             $invalidation['idinvalidation'],
             ArchiveInvalidator::INVALIDATION_STATUS_QUEUED,
         ]);
@@ -734,8 +736,10 @@ class Model
         }
 
         // archive was started over 24 hours ago, we assume it failed and take it over
-        Db::query("UPDATE `$table` SET `status` = ?, ts_started = NOW() WHERE idinvalidation = ?", [
+        Db::query("UPDATE `$table` SET `status` = ?, processing_host = ?, process_id = ?, ts_started = NOW() WHERE idinvalidation = ?", [
             ArchiveInvalidator::INVALIDATION_STATUS_IN_PROGRESS,
+            gethostname() ?: null,
+            Common::getProcessId(),
             $invalidation['idinvalidation'],
         ]);
 

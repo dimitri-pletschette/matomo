@@ -410,6 +410,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '12',
@@ -422,6 +424,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '13',
@@ -434,6 +438,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '19',
@@ -446,6 +452,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '5',
@@ -458,6 +466,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '15',
@@ -470,6 +480,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '8',
@@ -482,6 +494,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '14',
@@ -494,6 +508,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '20',
@@ -506,6 +522,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '3',
@@ -518,6 +536,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '2',
@@ -530,6 +550,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '10',
@@ -542,6 +564,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '17',
@@ -554,6 +578,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '22',
@@ -566,6 +592,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '7',
@@ -578,6 +606,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '1',
@@ -590,6 +620,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '16',
@@ -602,6 +634,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '6',
@@ -614,6 +648,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '9',
@@ -626,6 +662,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '18',
@@ -638,6 +676,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '21',
@@ -650,6 +690,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
             array (
                 'idinvalidation' => '4',
@@ -662,6 +704,8 @@ class ModelTest extends IntegrationTestCase
                 'report' => null,
                 'ts_started' => null,
                 'status' => 0,
+                'processing_host' => null,
+                'process_id' => null,
             ),
         );
 
