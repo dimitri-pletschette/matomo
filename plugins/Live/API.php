@@ -251,6 +251,18 @@ class API extends \Piwik\Plugin\API
     }
 
     /**
+     * Returns if the visitor profile is enabled for the given site(s))
+     *
+     * @param string|int|array $idSite
+     * @return bool
+     * @internal
+     */
+    public function isVisitorProfileEnabled($idSite): bool
+    {
+        return Live::isVisitorProfileEnabled($idSite);
+    }
+
+    /**
      * Returns the visitor ID of the most recent visit.
      *
      * @param int $idSite
