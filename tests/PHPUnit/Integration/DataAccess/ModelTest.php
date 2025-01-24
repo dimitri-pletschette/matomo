@@ -9,6 +9,7 @@
 
 namespace Piwik\Tests\Integration\DataAccess;
 
+use Piwik\Archive\ArchiveInvalidator;
 use Piwik\Common;
 use Piwik\Config;
 use Piwik\DataAccess\ArchiveTableCreator;
@@ -735,6 +736,38 @@ class ModelTest extends IntegrationTestCase
         $this->assertEquals([
             ['idsite' => 1, 'idinvalidation' => 1],
         ], $invalidations);
+    }
+
+    public function testStartArchiveEnrichesRecordWithHostnameAndProcessId()
+    {
+        Fixture::createWebsite('2014-01-01 00:00:00');
+
+        $this->insertInvalidations([
+            ['idsite' => 1, 'date1' => '2014-02-04', 'date2' => '2014-02-04', 'period' => 1, 'name' => 'done', 'ts_started' => Date::now()->getDatetime(), 'status' => ArchiveInvalidator::INVALIDATION_STATUS_IN_PROGRESS],
+            ['idsite' => 1, 'date1' => '2014-02-01', 'date2' => '2014-02-28', 'period' => 2, 'name' => 'done', 'status' => ArchiveInvalidator::INVALIDATION_STATUS_QUEUED],
+        ]);
+
+        $invalidations = Db::fetchAll("SELECT * FROM " . Common::prefixTable('archive_invalidations') . " ORDER BY idinvalidation ASC");
+
+        self::assertEmpty($invalidations[0]['processing_host']);
+        self::assertEmpty($invalidations[0]['process_id']);
+        self::assertEmpty($invalidations[1]['processing_host']);
+        self::assertEmpty($invalidations[1]['process_id']);
+
+        self::assertCount(2, $invalidations);
+
+        $this->model->startArchive($invalidations[0]);
+        $this->model->startArchive($invalidations[1]);
+
+        $invalidations = Db::fetchAll("SELECT * FROM " . Common::prefixTable('archive_invalidations') . " ORDER BY idinvalidation ASC");
+
+        self::assertCount(2, $invalidations);
+
+        // first one should not be updated as it's already running
+        self::assertEmpty($invalidations[0]['processing_host']);
+        self::assertEmpty($invalidations[0]['process_id']);
+        self::assertNotEmpty($invalidations[1]['processing_host']);
+        self::assertNotEmpty($invalidations[1]['process_id']);
     }
 
     private function insertArchiveData($archivesToInsert)
