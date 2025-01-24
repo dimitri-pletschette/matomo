@@ -595,14 +595,17 @@ class Filesystem
     {
         $filename = trim($filename);
 
+        // replace reserved characters
         // https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
         $filename = preg_replace('~[<>:"/\\\\|?*]~', '', $filename);
+
+        // replace special characters
+        // https://www.php.net/manual/it/regexp.reference.unicode.php
+        // - Cc: Control characters
+        // - Zs: Space separators
+        // - Pd: Dash punctuation
         $filename = preg_replace('~\p{Cc}~u', '', $filename);
-
-        // normalize spaces
         $filename = preg_replace('~\p{Zs}~u', ' ', $filename);
-
-        // normalize dashes
         $filename = preg_replace('~\p{Pd}~u', '-', $filename);
 
         return trim($filename);

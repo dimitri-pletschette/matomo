@@ -444,6 +444,36 @@ class FilesystemTest extends \PHPUnit\Framework\TestCase
             ['  spaces are trimmed  ', 'spaces are trimmed'],
             ['unicode    spaces', 'unicode    spaces'],
             ['unicode‒–—dashes', 'unicode---dashes'],
+            [
+                // english (en) export for date range, replaced "thsp" + "endash"
+                'Export _ Main metrics _ December 31, 2024 – January 1, 2025.csv',
+                'Export _ Main metrics _ December 31, 2024 - January 1, 2025.csv',
+            ],
+            [
+                // bulgarian (bg) export for date range, replaced "nnbsp" + "endash"
+                'Запазване _ Главни метрики _ 31 декември 2024 г. – 1 януари 2025 г..csv',
+                'Запазване _ Главни метрики _ 31 декември 2024 г. - 1 януари 2025 г..csv',
+            ],
+            [
+                // basque (eu) export for date range, replaced "endash"
+                'Esportatu _ Metrika nagusiak _ 2025(e)ko urtarrila 1–2.csv',
+                'Esportatu _ Metrika nagusiak _ 2025(e)ko urtarrila 1-2.csv',
+            ],
+            [
+                // kurdish (ku) export for date range, replaced "thsp" + "endash"
+                'Export _ Main metrics _ 31ê berfanbara 2024an – 1ê rêbendana 2025an.csv',
+                'Export _ Main metrics _ 31ê berfanbara 2024an - 1ê rêbendana 2025an.csv',
+            ],
+            [
+                // japanese (ja) export for date range, unchanged
+                'エクスポート _ メインメトリクス _ 2024年12月31日～2025年01月1日.csv',
+                'エクスポート _ メインメトリクス _ 2024年12月31日～2025年01月1日.csv',
+            ],
+            [
+                // simplified chinese (zh-cn) export for date range, unchanged
+                '导出 _ 主要指标 _ 2025年01月1日至2日.csv',
+                '导出 _ 主要指标 _ 2025年01月1日至2日.csv',
+            ],
         ];
     }
 }
