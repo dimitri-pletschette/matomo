@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<result>
+	<row>
+		<idSite>1</idSite>
+		<idVisit>122</idVisit>
+		<lastActionDateTime>2017-01-11 03:10:04</lastActionDateTime>
+		<siteName>Site 1</siteName>
+	</row>
+	<row>
+		<idSite>1</idSite>
+		<idVisit>121</idVisit>
+		<lastActionDateTime>2017-01-11 01:10:04</lastActionDateTime>
+		<siteName>Site 1</siteName>
+	</row>
+	<row>
+		<idSite>1</idSite>
+		<idVisit>90</idVisit>
+		<lastActionDateTime>2017-01-08 03:10:04</lastActionDateTime>
+		<siteName>Site 1</siteName>
+	</row>
+	<row>
+		<idSite>1</idSite>
+		<idVisit>89</idVisit>
+		<lastActionDateTime>2017-01-08 01:10:04</lastActionDateTime>
+		<siteName>Site 1</siteName>
+	</row>
+	<row>
+		<idSite>1</idSite>
+		<idVisit>58</idVisit>
+		<lastActionDateTime>2017-01-05 03:10:04</lastActionDateTime>
+		<siteName>Site 1</siteName>
+	</row>
+	<row>
+		<idSite>1</idSite>
+		<idVisit>57</idVisit>
+		<lastActionDateTime>2017-01-05 01:10:04</lastActionDateTime>
+		<siteName>Site 1</siteName>
+	</row>
+	<row>
+		<idSite>1</idSite>
+		<idVisit>26</idVisit>
+		<lastActionDateTime>2017-01-02 03:10:04</lastActionDateTime>
+		<siteName>Site 1</siteName>
+	</row>
+	<row>
+		<idSite>1</idSite>
+		<idVisit>25</idVisit>
+		<lastActionDateTime>2017-01-02 01:10:04</lastActionDateTime>
+		<siteName>Site 1</siteName>
+	</row>
+</result>

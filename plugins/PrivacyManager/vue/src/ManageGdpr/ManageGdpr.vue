@@ -43,6 +43,7 @@
                 :show-all-sites-item="true"
                 :switch-site-on-select="false"
                 :show-selected-site="true"
+                @update:modelValue="changeSite($event)"
               />
             </div>
           </div>
@@ -106,7 +107,7 @@
             <th>{{ translate('General_VisitorIP') }}</th>
             <th>{{ translate('General_UserId') }}</th>
             <th>{{ translate('General_Details') }}</th>
-            <th v-show="profileEnabled">{{ translate('General_Action') }}</th>
+            <th v-show="hasActions">{{ translate('General_Action') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -189,11 +190,12 @@
                 />
               </span>
             </td>
-            <td v-show="profileEnabled">
+            <td v-show="hasActions">
               <a
                 class="visitorLogTooltip"
                 title="View visitor profile"
                 @click="showProfile(dataSubject.visitorId, dataSubject.idSite)"
+                v-show="dataSubject.visitorId"
               >
                 <img src="plugins/Live/images/visitorProfileLaunch.png" style="margin-right:3.5px"/>
                 <span>{{ translate('Live_ViewVisitorProfile') }}</span>
@@ -249,6 +251,7 @@ import {
   ContentTable,
   NotificationsStore,
   MatomoUrl,
+  SiteRef,
 } from 'CoreHome';
 import { SegmentGenerator } from 'SegmentEditor';
 import { SaveButton, Field } from 'CorePluginsAdmin';
@@ -277,7 +280,7 @@ interface DataSubject {
 interface ManageGdprState {
   isLoading: boolean;
   isDeleting: boolean;
-  site: Record<string, string>;
+  site: SiteRef;
   segment_filter: string;
   dataSubjects: DataSubject[];
   toggleAll: boolean;
@@ -305,7 +308,7 @@ export default defineComponent({
         id: 'all',
         name: translate('UsersManager_AllWebsites'),
       },
-      segment_filter: 'userId==',
+      segment_filter: 'visitId==',
       dataSubjects: [],
       toggleAll: true,
       hasSearched: false,
@@ -325,7 +328,33 @@ export default defineComponent({
       },
     };
   },
+  created() {
+    this.changeSite(this.site);
+  },
   methods: {
+    changeSite(newValue: SiteRef) {
+      AjaxHelper.fetch(
+        {
+          module: 'API',
+          method: 'Live.isVisitorProfileEnabled',
+          filter_limit: -1,
+          idSite: newValue.id,
+        },
+        {
+          createErrorNotification: false, // don't show errors from this API in UI
+        },
+      ).then((response) => {
+        this.profileEnabled = response.value;
+      }).catch(() => {
+        this.profileEnabled = false;
+      }).finally(() => {
+        if (!this.profileEnabled && this.segment_filter === 'userId==') {
+          this.segment_filter = 'visitId==';
+        } else if (this.profileEnabled && this.segment_filter === 'visitId==') {
+          this.segment_filter = 'userId==';
+        }
+      });
+    },
     showSuccessNotification(message: string) {
       const notificationInstanceId = NotificationsStore.show({
         message,
@@ -429,6 +458,9 @@ export default defineComponent({
     },
   },
   computed: {
+    hasActions(): boolean {
+      return !!this.dataSubjects.find((elem) => !!elem.visitorId);
+    },
     hasActiveDataSubjects(): boolean {
       return !!this.activatedDataSubjects.length;
     },

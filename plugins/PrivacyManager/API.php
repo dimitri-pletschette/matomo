@@ -13,6 +13,8 @@ use Piwik\API\Request;
 use Piwik\Container\StaticContainer;
 use Piwik\Piwik;
 use Piwik\Config as PiwikConfig;
+use Piwik\Plugin\Manager;
+use Piwik\Plugins\Live\Live;
 use Piwik\Plugins\PrivacyManager\Model\DataSubjects;
 use Piwik\Plugins\PrivacyManager\Dao\LogDataAnonymizer;
 use Piwik\Plugins\PrivacyManager\Model\LogDataAnonymizations;
@@ -122,9 +124,53 @@ class API extends \Piwik\Plugin\API
             'countryFlag',
         ];
 
+        $GDPRColumnsToKeep = [
+            'lastActionDateTime',
+            'idVisit',
+            'idSite',
+            'siteName',
+        ];
+
+        $isLivePluginActivated = Manager::getInstance()->isPluginActivated('Live');
+        $siteIds = Site::getIdSitesFromIdSitesString($idSite);
+        $siteIdsWithVisitorLogsOrProfilesDisabled = [];
+        foreach ($siteIds as $siteId) {
+            if ($isLivePluginActivated) {
+                $isVisitorLogEnabled = Live::isVisitorLogEnabled($siteId);
+                $isVisitorProfileEnabled = Live::isVisitorProfileEnabled($siteId);
+
+                if (!$isVisitorLogEnabled || !$isVisitorProfileEnabled) {
+                    $siteIdsWithVisitorLogsOrProfilesDisabled[] = $siteId;
+                }
+            }
+        }
+
         foreach ($result->getColumns() as $column) {
             if (!in_array($column, $columnsToKeep)) {
                 $result->deleteColumn($column);
+            }
+        }
+
+        /*
+         * If there are any sites detected that have visitor logs or visitor
+         * profiles disabled, then filter rows associated with those sites.
+         *
+         * For rows which whose site Id match a site with disabled visitor logs
+         * or profiles, all columns for said row are removed, except those defined in
+         * $GDPRColumnsToKeep.
+         */
+        if (count($siteIdsWithVisitorLogsOrProfilesDisabled) > 0) {
+            $resultDataInRows = $result->getRowsWithoutSummaryRow();
+            foreach ($resultDataInRows as $row) {
+                $siteIdOfCurrentRow = $row->getColumn('idSite');
+                if (in_array($siteIdOfCurrentRow, $siteIdsWithVisitorLogsOrProfilesDisabled)) {
+                    $columnNames = array_keys($row->getColumns());
+                    foreach ($columnNames as $columnName) {
+                        if (!in_array($columnName, $GDPRColumnsToKeep)) {
+                            $row->deleteColumn($columnName);
+                        }
+                    }
+                }
             }
         }
 

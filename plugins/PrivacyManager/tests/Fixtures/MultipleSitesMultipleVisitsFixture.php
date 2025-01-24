@@ -278,8 +278,28 @@ class MultipleSitesMultipleVisitsFixture extends Fixture
                 $this->assertSame($siteid, $idSite);
 
                 $this->createGoals($idSite, 2);
+                if ($idSite === 3) {
+                    $this->setSiteVisitorLogsDisabled($idSite);
+                }
+                if ($idSite === 1) {
+                    $this->setSiteVisitorProfilesDisabled($idSite);
+                }
             }
         }
+    }
+
+    private function setSiteVisitorLogsDisabled($idSite)
+    {
+        $settings = new \Piwik\Plugins\Live\MeasurableSettings($idSite);
+        $settings->disableVisitorLog->setValue(true);
+        $settings->save();
+    }
+
+    private function setSiteVisitorProfilesDisabled($idSite)
+    {
+        $settings = new \Piwik\Plugins\Live\MeasurableSettings($idSite);
+        $settings->disableVisitorProfile->setValue(true);
+        $settings->save();
     }
 
     public function createGoals($idSite, $numGoals)

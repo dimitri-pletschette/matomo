@@ -150,6 +150,22 @@ class APITest extends SystemTestCase
         ]);
     }
 
+    public function testfinddatasubjectsspecificsiteNoVisitorlogs()
+    {
+        $this->runAnyApiTest('PrivacyManager.findDataSubjects', 'specificSiteNoVisitorLogs', [
+            'idSite'     => '3',
+            'segment'    => 'countryCode==CN',
+        ]);
+    }
+
+    public function testfinddatasubjectsspecificsiteNoVisitorProfiles()
+    {
+        $this->runAnyApiTest('PrivacyManager.findDataSubjects', 'specificSiteNoVisitorProfiles', [
+            'idSite'     => '1',
+            'segment'    => 'countryCode==CN',
+        ]);
+    }
+
     public static function getOutputPrefix()
     {
         return '';

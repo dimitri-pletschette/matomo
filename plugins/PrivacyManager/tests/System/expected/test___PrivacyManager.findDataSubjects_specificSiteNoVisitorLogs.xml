@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<result>
+	<row>
+		<idSite>3</idSite>
+		<idVisit>154</idVisit>
+		<lastActionDateTime>2017-01-11 03:10:01</lastActionDateTime>
+		<siteName>Site 3</siteName>
+	</row>
+	<row>
+		<idSite>3</idSite>
+		<idVisit>153</idVisit>
+		<lastActionDateTime>2017-01-11 01:10:01</lastActionDateTime>
+		<siteName>Site 3</siteName>
+	</row>
+</result>
